@@ -1,0 +1,476 @@
+---
+
+# Project source code URL: https://github.com/lago/lago
+
+lago_enabled: true
+
+lago_identifier: lago
+
+lago_architecture: ''
+
+lago_uid: ''
+lago_gid: ''
+
+lago_version: v0.28.1-beta
+
+lago_scheme: https
+
+# The hostname at which lago is served.
+lago_hostname: ''
+
+# The path at which lago is served.
+# This value must either be `/` or not end with a slash (e.g. `/lago`).
+lago_path_prefix: /
+
+lago_base_path: "/{{ lago_identifier }}"
+
+lago_container_image_repository_name_suffix: |-
+  {{
+    {
+      'amd64': '',
+      'arm64': '-arm64v8',
+    }[lago_architecture]
+  }}
+
+# The base container network. It will be auto-created by this role if it doesn't exist already.
+lago_container_network: "{{ lago_identifier }}"
+
+lago_container_labels_traefik_enabled: true
+lago_container_labels_traefik_docker_network: "{{ lago_container_network }}"
+lago_container_labels_traefik_hostname: "{{ lago_hostname }}"
+# The path prefix must either be `/` or not end with a slash (e.g. `/lago`).
+lago_container_labels_traefik_path_prefix: "{{ lago_path_prefix }}"
+lago_container_labels_traefik_entrypoints: web-secure
+
+lago_api_relative_path_prefix: /api
+lago_api_path_prefix: "{{ '' if lago_path_prefix == '/' else lago_path_prefix }}{{ lago_api_relative_path_prefix }}"
+
+lago_api_base_path: "{{ lago_base_path }}/api"
+lago_api_data_path: "{{ lago_base_path }}/data"
+
+lago_api_container_image: "{{ lago_api_container_image_registry_prefix }}getlago/api{{ lago_container_image_repository_name_suffix }}:{{ lago_api_container_image_tag }}"
+lago_api_container_image_registry_prefix: docker.io/
+lago_api_container_image_tag: "{{ lago_version }}"
+lago_api_container_image_force_pull: "{{ lago_api_container_image.endswith(':latest') }}"
+
+lago_api_container_network: "{{ lago_container_network }}"
+
+# A list of additional container networks that the container would be connected to.
+# The role does not create these networks, so make sure they already exist.
+# Use this to expose this container to another reverse proxy, which runs in a different container network.
+lago_api_container_additional_networks: "{{ lago_api_container_additional_networks_auto + lago_api_container_additional_networks_custom }}"
+lago_api_container_additional_networks_auto: []
+lago_api_container_additional_networks_custom: []
+
+# Specifies how the container publishes its HTTP port
+#
+# Takes an "<ip>:<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
+lago_api_container_http_bind_port: ''
+
+# lago_api_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
+# See `../templates/api/labels.j2` for details.
+#
+# To inject your own other container labels, see `lago_api_container_labels_additional_labels`.
+lago_api_container_labels_traefik_enabled: "{{ lago_container_labels_traefik_enabled }}"
+lago_api_container_labels_traefik_docker_network: "{{ lago_container_labels_traefik_docker_network }}"
+lago_api_container_labels_traefik_hostname: "{{ lago_container_labels_traefik_hostname }}"
+# The path prefix must either be `/` or not end with a slash (e.g. `/lago`).
+lago_api_container_labels_traefik_path_prefix: "{{ lago_api_path_prefix }}"
+# This rule uses a trailing slash for the path prefix (/api -> /api/),
+# to avoid capturing legit requests (like `/api-keys.ebbdfaad3d6c7b0d14a7.js`) meant for the frontend.
+lago_api_container_labels_traefik_rule: "Host(`{{ lago_api_container_labels_traefik_hostname }}`){% if lago_api_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ lago_api_container_labels_traefik_path_prefix }}/`){% endif %}"
+lago_api_container_labels_traefik_priority: 0
+lago_api_container_labels_traefik_entrypoints: "{{ lago_container_labels_traefik_entrypoints }}"
+lago_api_container_labels_traefik_tls: "{{ lago_api_container_labels_traefik_entrypoints != 'web' }}"
+lago_api_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+
+# Controls which additional headers to attach to all HTTP requests.
+# To add your own custom request headers, use `lago_api_container_labels_traefik_additional_response_headers_custom`
+lago_api_container_labels_traefik_additional_request_headers: "{{ lago_api_container_labels_traefik_additional_request_headers_auto | combine(lago_api_container_labels_traefik_additional_request_headers_custom) }}"
+lago_api_container_labels_traefik_additional_request_headers_auto: {}
+lago_api_container_labels_traefik_additional_request_headers_custom: {}
+
+# Controls which additional headers to attach to all HTTP responses.
+# To add your own custom response headers, use `lago_api_container_labels_traefik_additional_response_headers_custom`
+lago_api_container_labels_traefik_additional_response_headers: "{{ lago_api_container_labels_traefik_additional_response_headers_auto | combine(lago_api_container_labels_traefik_additional_response_headers_custom) }}"
+lago_api_container_labels_traefik_additional_response_headers_auto: |
+  {{
+    {}
+    | combine ({'X-XSS-Protection': lago_http_header_xss_protection} if lago_http_header_xss_protection else {})
+    | combine ({'X-Frame-Options': lago_http_header_frame_options} if lago_http_header_frame_options else {})
+    | combine ({'X-Content-Type-Options': lago_http_header_content_type_options} if lago_http_header_content_type_options else {})
+    | combine ({'Content-Security-Policy': lago_http_header_content_security_policy} if lago_http_header_content_security_policy else {})
+    | combine ({'Permission-Policy': lago_http_header_content_permission_policy} if lago_http_header_content_permission_policy else {})
+    | combine ({'Strict-Transport-Security': lago_http_header_strict_transport_security} if lago_http_header_strict_transport_security and lago_api_container_labels_traefik_tls else {})
+  }}
+lago_api_container_labels_traefik_additional_response_headers_custom: {}
+
+# lago_api_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
+# See `../templates/api/labels.j2` for details.
+#
+# Example:
+# lago_api_container_labels_additional_labels: |
+#   my.label=1
+#   another.label="here"
+lago_api_container_labels_additional_labels: ''
+
+# A list of additional "volumes" to mount in the container.
+#
+# See the `--mount` documentation for the `docker run` command.
+#
+# Example:
+# lago_api_container_additional_volumes:
+#   - type: bind
+#     src: /path/on/the/host
+#     dst: /data
+#   - type: bind
+#     src: /another-path/on/the/host
+#     dst: /read-only
+#     options: readonly
+lago_api_container_additional_volumes: []
+
+# A list of extra arguments to pass to the container
+lago_api_container_extra_arguments: []
+
+# Controls the LAGO_RSA_PRIVATE_KEY environment variable
+# This is to be generated with: `openssl genrsa 2048 | base64 --wrap=0`
+lago_api_environment_variable_lago_rsa_private_key: ''
+
+# Controls the LAGO_API_URL environment variable
+lago_api_environment_variable_lago_api_url: "{{ lago_scheme }}://{{ lago_hostname }}{{ lago_api_path_prefix }}"
+
+# Controls the LAGO_FRONT_URL environment variable
+lago_api_environment_variable_lago_front_url: "{{ lago_scheme }}://{{ lago_hostname }}{{ '' if lago_path_prefix == '/' else lago_path_prefix }}"
+
+# Controls the DATABASE_URL environment variable
+lago_api_environment_variable_database_url: "postgresql://{{ lago_database_username }}:{{ lago_database_password }}@{{ lago_database_hostname }}:{{ lago_database_port }}/{{ lago_database_name }}"
+
+# Controls the REDIS_URL environment variable
+lago_api_environment_variable_redis_url: "redis://{{ lago_redis_hostname }}:{{ lago_redis_port }}"
+
+# Controls the REDIS_PASSWORD environment variable
+lago_api_environment_variable_redis_password: "{{ lago_redis_password }}"
+
+# Controls the LAGO_REDIS_CACHE_URL environment variable
+lago_api_environment_variable_lago_redis_cache_url: "redis://{{ lago_redis_cache_hostname }}:{{ lago_redis_cache_port }}"
+
+# Controls the LAGO_REDIS_CACHE_PASSWORD environment variable
+lago_api_environment_variable_lago_redis_cache_password: "{{ lago_redis_cache_password }}"
+
+# Controls the LAGO_PDF_URL environment variable
+lago_api_environment_variable_lago_pdf_url: "http://{{ lago_identifier }}-pdf:3000"
+
+# Controls the SENTRY_DSN environment variable
+lago_api_environment_variable_sentry_dsn: ''
+
+# Controls the LAGO_SIDEKIQ_WEB environment variable
+lago_api_environment_variable_lago_sidekiq_web: ''
+
+# Controls the LAGO_OAUTH_PROXY_URL environment variable
+lago_api_environment_variable_lago_oauth_proxy_url: https://proxy.getlago.com
+
+# Controls the LAGO_LICENSE environment variable
+lago_api_environment_variable_lago_license: ''
+
+# Controls the SECRET_KEY_BASE environment variable
+lago_api_environment_variable_secret_key_base: ''
+
+# Controls the ENCRYPTION_PRIMARY_KEY environment variable
+lago_api_environment_variable_encryption_primary_key: ''
+
+# Controls the ENCRYPTION_DETERMINISTIC_KEY environment variable
+lago_api_environment_variable_encryption_deterministic_key: ''
+
+# Controls the ENCRYPTION_KEY_DERIVATION_SALT environment variable
+lago_api_environment_variable_encryption_key_derivation_salt: ''
+
+# Controls the RAILS_ENV environment variable
+lago_api_environment_variable_rails_env: production
+
+# Controls the RAILS_LOG_TO_STDOUT environment variable
+lago_api_environment_variable_rails_log_to_stdout: true
+
+# Controls the NEW_RELIC_AGENT_ENABLED environment variable
+lago_api_environment_variable_new_relic_agent_enabled: false
+
+# Additional environment variables.
+lago_api_environment_variables_additional_variables: ''
+
+# List of systemd services that lago-api.service depends on
+lago_api_systemd_required_services_list: "{{ lago_api_systemd_required_systemd_services_list_default + lago_api_systemd_required_systemd_services_list_auto + lago_api_systemd_required_systemd_services_list_custom }}"
+lago_api_systemd_required_systemd_services_list_default: ['docker.service']
+lago_api_systemd_required_systemd_services_list_auto: []
+lago_api_systemd_required_systemd_services_list_custom: []
+
+lago_front_base_path: "{{ lago_base_path }}/front"
+
+lago_front_container_image: "{{ lago_front_container_image_registry_prefix }}getlago/front{{ lago_container_image_repository_name_suffix }}:{{ lago_front_container_image_tag }}"
+lago_front_container_image_registry_prefix: docker.io/
+lago_front_container_image_tag: "{{ lago_version }}"
+lago_front_container_image_force_pull: "{{ lago_front_container_image.endswith(':latest') }}"
+
+lago_front_container_network: "{{ lago_container_network }}"
+
+# A list of additional container networks that the container would be connected to.
+# The role does not create these networks, so make sure they already exist.
+# Use this to expose this container to another reverse proxy, which runs in a different container network.
+lago_front_container_additional_networks: "{{ lago_front_container_additional_networks_auto + lago_front_container_additional_networks_custom }}"
+lago_front_container_additional_networks_auto: []
+lago_front_container_additional_networks_custom: []
+
+# Specifies how the container publishes its HTTP port
+#
+# Takes an "<ip>:<port>" value (e.g. "127.0.0.1:80"), just a port number or an empty string to not expose.
+lago_front_container_http_bind_port: ''
+
+# lago_front_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
+# See `../templates/front/labels.j2` for details.
+#
+# To inject your own other container labels, see `lago_front_container_labels_additional_labels`.
+lago_front_container_labels_traefik_enabled: "{{ lago_container_labels_traefik_enabled }}"
+lago_front_container_labels_traefik_docker_network: "{{ lago_container_labels_traefik_docker_network }}"
+lago_front_container_labels_traefik_hostname: "{{ lago_container_labels_traefik_hostname }}"
+# The path prefix must either be `/` or not end with a slash (e.g. `/lago`).
+lago_front_container_labels_traefik_path_prefix: "{{ lago_container_labels_traefik_path_prefix }}"
+lago_front_container_labels_traefik_rule: "Host(`{{ lago_front_container_labels_traefik_hostname }}`){% if lago_front_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ lago_front_container_labels_traefik_path_prefix }}`){% endif %}"
+lago_front_container_labels_traefik_priority: 0
+lago_front_container_labels_traefik_entrypoints: "{{ lago_container_labels_traefik_entrypoints }}"
+lago_front_container_labels_traefik_tls: "{{ lago_front_container_labels_traefik_entrypoints != 'web' }}"
+lago_front_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+
+# Controls which additional headers to attach to all HTTP requests.
+# To add your own custom request headers, use `lago_front_container_labels_traefik_additional_response_headers_custom`
+lago_front_container_labels_traefik_additional_request_headers: "{{ lago_front_container_labels_traefik_additional_request_headers_auto | combine(lago_front_container_labels_traefik_additional_request_headers_custom) }}"
+lago_front_container_labels_traefik_additional_request_headers_auto: {}
+lago_front_container_labels_traefik_additional_request_headers_custom: {}
+
+# Controls which additional headers to attach to all HTTP responses.
+# To add your own custom response headers, use `lago_front_container_labels_traefik_additional_response_headers_custom`
+lago_front_container_labels_traefik_additional_response_headers: "{{ lago_front_container_labels_traefik_additional_response_headers_auto | combine(lago_front_container_labels_traefik_additional_response_headers_custom) }}"
+lago_front_container_labels_traefik_additional_response_headers_auto: |
+  {{
+    {}
+    | combine ({'X-XSS-Protection': lago_http_header_xss_protection} if lago_http_header_xss_protection else {})
+    | combine ({'X-Frame-Options': lago_http_header_frame_options} if lago_http_header_frame_options else {})
+    | combine ({'X-Content-Type-Options': lago_http_header_content_type_options} if lago_http_header_content_type_options else {})
+    | combine ({'Content-Security-Policy': lago_http_header_content_security_policy} if lago_http_header_content_security_policy else {})
+    | combine ({'Permission-Policy': lago_http_header_content_permission_policy} if lago_http_header_content_permission_policy else {})
+    | combine ({'Strict-Transport-Security': lago_http_header_strict_transport_security} if lago_http_header_strict_transport_security and lago_front_container_labels_traefik_tls else {})
+  }}
+lago_front_container_labels_traefik_additional_response_headers_custom: {}
+
+# lago_front_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
+# See `../templates/front/labels.j2` for details.
+#
+# Example:
+# lago_front_container_labels_additional_labels: |
+#   my.label=1
+#   another.label="here"
+lago_front_container_labels_additional_labels: ''
+
+# A list of additional "volumes" to mount in the container.
+#
+# See the `--mount` documentation for the `docker run` command.
+#
+# Example:
+# lago_front_container_additional_volumes:
+#   - type: bind
+#     src: /path/on/the/host
+#     dst: /data
+#   - type: bind
+#     src: /another-path/on/the/host
+#     dst: /read-only
+#     options: readonly
+lago_front_container_additional_volumes: []
+
+# A list of extra arguments to pass to the container
+lago_front_container_extra_arguments: []
+
+# Controls the LAGO_RSA_PRIVATE_KEY environment variable
+# This is to be generated with: `openssl genrsa 2048 | base64 --wrap=0`
+lago_front_environment_variable_lago_rsa_private_key: ''
+
+# Controls the API_URL environment variable
+lago_front_environment_variable_api_url: "{{ lago_api_environment_variable_lago_api_url }}"
+
+# Controls the APP_ENV environment variable
+lago_front_environment_variable_app_env: production
+
+# Controls the SENTRY_DSN environment variable
+lago_front_environment_variable_sentry_dsn: ''
+
+# Controls the CODEGEN_API environment variable
+lago_front_environment_variable_codegen_api: "{{ lago_front_environment_variable_api_url }}"
+
+# Controls the LAGO_DISABLE_SIGNUP environment variable
+lago_front_environment_variable_lago_disable_signup: true
+
+# Controls the LAGO_OAUTH_PROXY_URL environment variable
+lago_front_environment_variable_lago_oauth_proxy_url: "{{ lago_api_environment_variable_lago_oauth_proxy_url }}"
+
+# Additional environment variables.
+lago_front_environment_variables_additional_variables: ''
+
+# List of systemd services that lago-api.service depends on
+lago_front_systemd_required_services_list: "{{ lago_front_systemd_required_systemd_services_list_default + lago_front_systemd_required_systemd_services_list_auto + lago_front_systemd_required_systemd_services_list_custom }}"
+lago_front_systemd_required_systemd_services_list_default: ['docker.service']
+lago_front_systemd_required_systemd_services_list_auto: []
+lago_front_systemd_required_systemd_services_list_custom: []
+
+lago_pdf_base_path: "{{ lago_base_path }}/pdf"
+
+lago_pdf_container_image: "{{ lago_pdf_container_image_registry_prefix }}getlago/lago-gotenberg{{ lago_container_image_repository_name_suffix }}:{{ lago_pdf_container_image_tag }}"
+lago_pdf_container_image_registry_prefix: docker.io/
+lago_pdf_container_image_tag: 7
+lago_pdf_container_image_force_pull: "{{ lago_pdf_container_image.endswith(':latest') }}"
+
+lago_pdf_container_network: "{{ lago_container_network }}"
+
+# A list of additional container networks that the container would be connected to.
+# The role does not create these networks, so make sure they already exist.
+# Use this to expose this container to another reverse proxy, which runs in a different container network.
+lago_pdf_container_additional_networks: "{{ lago_pdf_container_additional_networks_auto + lago_pdf_container_additional_networks_custom }}"
+lago_pdf_container_additional_networks_auto: []
+lago_pdf_container_additional_networks_custom: []
+
+# Specifies how the container publishes its HTTP port
+#
+# Takes an "<ip>:<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
+lago_pdf_container_http_bind_port: ''
+
+# lago_pdf_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
+# See `../templates/pdf/labels.j2` for details.
+#
+# To inject your own other container labels, see `lago_pdf_container_labels_additional_labels`.
+lago_pdf_container_labels_traefik_enabled: false
+lago_pdf_container_labels_traefik_docker_network: "{{ lago_container_labels_traefik_docker_network }}"
+lago_pdf_container_labels_traefik_hostname: "{{ lago_container_labels_traefik_hostname }}"
+# The path prefix must either be `/` or not end with a slash (e.g. `/lago`).
+lago_pdf_container_labels_traefik_path_prefix: "{{ lago_container_labels_traefik_path_prefix }}"
+lago_pdf_container_labels_traefik_rule: "Host(`{{ lago_pdf_container_labels_traefik_hostname }}`){% if lago_pdf_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ lago_pdf_container_labels_traefik_path_prefix }}`){% endif %}"
+lago_pdf_container_labels_traefik_priority: 0
+lago_pdf_container_labels_traefik_entrypoints: "{{ lago_container_labels_traefik_entrypoints }}"
+lago_pdf_container_labels_traefik_tls: "{{ lago_pdf_container_labels_traefik_entrypoints != 'web' }}"
+lago_pdf_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+
+# Controls which additional headers to attach to all HTTP requests.
+# To add your own custom request headers, use `lago_pdf_container_labels_traefik_additional_response_headers_custom`
+lago_pdf_container_labels_traefik_additional_request_headers: "{{ lago_pdf_container_labels_traefik_additional_request_headers_auto | combine(lago_pdf_container_labels_traefik_additional_request_headers_custom) }}"
+lago_pdf_container_labels_traefik_additional_request_headers_auto: {}
+lago_pdf_container_labels_traefik_additional_request_headers_custom: {}
+
+# Controls which additional headers to attach to all HTTP responses.
+# To add your own custom response headers, use `lago_pdf_container_labels_traefik_additional_response_headers_custom`
+lago_pdf_container_labels_traefik_additional_response_headers: "{{ lago_pdf_container_labels_traefik_additional_response_headers_auto | combine(lago_pdf_container_labels_traefik_additional_response_headers_custom) }}"
+lago_pdf_container_labels_traefik_additional_response_headers_auto: |
+  {{
+    {}
+    | combine ({'X-XSS-Protection': lago_http_header_xss_protection} if lago_http_header_xss_protection else {})
+    | combine ({'X-Frame-Options': lago_http_header_frame_options} if lago_http_header_frame_options else {})
+    | combine ({'X-Content-Type-Options': lago_http_header_content_type_options} if lago_http_header_content_type_options else {})
+    | combine ({'Content-Security-Policy': lago_http_header_content_security_policy} if lago_http_header_content_security_policy else {})
+    | combine ({'Permission-Policy': lago_http_header_content_permission_policy} if lago_http_header_content_permission_policy else {})
+    | combine ({'Strict-Transport-Security': lago_http_header_strict_transport_security} if lago_http_header_strict_transport_security and lago_pdf_container_labels_traefik_tls else {})
+  }}
+lago_pdf_container_labels_traefik_additional_response_headers_custom: {}
+
+# lago_pdf_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
+# See `../templates/pdf/labels.j2` for details.
+#
+# Example:
+# lago_pdf_container_labels_additional_labels: |
+#   my.label=1
+#   another.label="here"
+lago_pdf_container_labels_additional_labels: ''
+
+# A list of additional "volumes" to mount in the container.
+#
+# See the `--mount` documentation for the `docker run` command.
+#
+# Example:
+# lago_pdf_container_additional_volumes:
+#   - type: bind
+#     src: /path/on/the/host
+#     dst: /data
+#   - type: bind
+#     src: /another-path/on/the/host
+#     dst: /read-only
+#     options: readonly
+lago_pdf_container_additional_volumes: []
+
+# A list of extra arguments to pass to the container
+lago_pdf_container_extra_arguments: []
+
+# Additional environment variables.
+lago_pdf_environment_variables_additional_variables: ''
+
+# List of systemd services that lago-api.service depends on
+lago_pdf_systemd_required_services_list: "{{ lago_pdf_systemd_required_systemd_services_list_default + lago_pdf_systemd_required_systemd_services_list_auto + lago_pdf_systemd_required_systemd_services_list_custom }}"
+lago_pdf_systemd_required_systemd_services_list_default: ['docker.service']
+lago_pdf_systemd_required_systemd_services_list_auto: []
+lago_pdf_systemd_required_systemd_services_list_custom: []
+
+# Specifies the value of the `X-XSS-Protection` header
+# Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
+#
+# Learn more about it is here:
+# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+# - https://portswigger.net/web-security/cross-site-scripting/reflected
+lago_http_header_xss_protection: "1; mode=block"
+
+# Specifies the value of the `X-Frame-Options` header which controls whether framing can happen.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+lago_http_header_frame_options: SAMEORIGIN
+
+# Specifies the value of the `X-Content-Type-Options` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
+lago_http_header_content_type_options: nosniff
+
+# Specifies the value of the `Content-Security-Policy` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+lago_http_header_content_security_policy: frame-ancestors 'self'
+
+# Specifies the value of the `Permission-Policy` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permission-Policy
+lago_http_header_content_permission_policy: "{{ 'interest-cohort=()' if lago_floc_optout_enabled else '' }}"
+
+# Specifies the value of the `Strict-Transport-Security` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+lago_http_header_strict_transport_security: "max-age=31536000; includeSubDomains{{ '; preload' if lago_hsts_preload_enabled else '' }}"
+
+# Controls whether to send a "Permissions-Policy interest-cohort=();" header along with all responses
+#
+# Learn more about what it is here:
+# - https://www.eff.org/deeplinks/2021/03/googles-floc-terrible-idea
+# - https://paramdeo.com/blog/opting-your-website-out-of-googles-floc-network
+# - https://amifloced.org/
+#
+# Of course, a better solution is to just stop using browsers (like Chrome), which participate in such tracking practices.
+# See: `lago_content_permission_policy`
+lago_floc_optout_enabled: true
+
+# Controls if HSTS preloading is enabled
+#
+# In its strongest and recommended form, the [HSTS policy](https://www.chromium.org/hsts) includes all subdomains, and
+# indicates a willingness to be "preloaded" into browsers:
+# `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`
+# For more information visit:
+# - https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
+# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+# - https://hstspreload.org/#opt-in
+# See: `lago_http_header_strict_transport_security`
+lago_hsts_preload_enabled: false
+
+lago_database_username: lago
+lago_database_password: ''
+lago_database_hostname: ''
+lago_database_port: 5432
+lago_database_name: lago
+
+lago_redis_hostname: ''
+lago_redis_port: 6379
+lago_redis_password: ''
+
+lago_redis_cache_hostname: "{{ lago_redis_hostname }}"
+lago_redis_cache_port: "{{ lago_redis_port }}"
+lago_redis_cache_password: "{{ lago_redis_password }}"

@@ -1,0 +1,16 @@
+#jinja2: lstrip_blocks: "True"
+[Unit]
+Description=Lago API Clock ({{ lago_identifier }}-api-clock)
+Requires={{ lago_identifier }}-api.service
+After={{ lago_identifier }}-api.service
+DefaultDependencies=no
+
+[Service]
+Type=simple
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} exec {{ lago_identifier }}-api ./scripts/start.clock.sh
+Restart=always
+RestartSec=30
+SyslogIdentifier={{ lago_identifier }}-api-clock
+
+[Install]
+WantedBy=multi-user.target

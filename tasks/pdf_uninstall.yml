@@ -1,0 +1,25 @@
+---
+
+- name: Check existence of Lago PDF systemd service
+  ansible.builtin.stat:
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}--pdf.service"
+  register: lago_pdf_service_stat
+
+- when: lago_pdf_service_stat.stat.exists | bool
+  block:
+    - name: Ensure Lago PDF systemd service is stopped
+      ansible.builtin.service:
+        name: "{{ lago_identifier }}--pdf"
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Ensure Lago PDF systemd service does not exist
+      ansible.builtin.file:
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}--pdf.service"
+        state: absent
+
+    - name: Ensure Lago path doesn't exist
+      ansible.builtin.file:
+        path: "{{ lago_-pdf_base_path }}"
+        state: absent

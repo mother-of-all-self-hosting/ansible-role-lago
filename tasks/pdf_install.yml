@@ -1,0 +1,43 @@
+---
+
+- name: Ensure Lago PDF paths exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0750
+    owner: "{{ lago_uid }}"
+    group: "{{ lago_gid }}"
+  with_items:
+    - "{{ lago_pdf_base_path }}"
+
+- name: Ensure Lago PDF support files installed
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/pdf/{{ item }}.j2"
+    dest: "{{ lago_pdf_base_path }}/{{ item }}"
+    mode: 0640
+    owner: "{{ lago_uid }}"
+    group: "{{ lago_gid }}"
+  with_items:
+    - env
+    - labels
+
+- name: Ensure Lago PDF container image is pulled
+  community.docker.docker_image:
+    name: "{{ lago_pdf_container_image }}"
+    source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
+    force_source: "{{ lago_pdf_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
+    force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else lago_pdf_container_image_force_pull }}"
+  register: result
+  retries: "{{ devture_playbook_help_container_retries_count }}"
+  delay: "{{ devture_playbook_help_container_retries_delay }}"
+  until: result is not failed
+
+- name: Ensure Lago PDF container network is created
+  community.general.docker_network:
+    name: "{{ lago_pdf_container_network }}"
+    driver: bridge
+
+- name: Ensure Lago PDF systemd service is present
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/pdf/systemd/lago-pdf.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-pdf.service"

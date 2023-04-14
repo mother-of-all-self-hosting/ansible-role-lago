@@ -1,0 +1,20 @@
+---
+
+- name: Check existence of Lago API Clock systemd service
+  ansible.builtin.stat:
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api-clock.service"
+  register: lago_api_clock_service_stat
+
+- when: lago_api_clock_service_stat.stat.exists | bool
+  block:
+    - name: Ensure Lago API Clock systemd service is stopped
+      ansible.builtin.service:
+        name: "{{ lago_identifier }}-api-clock"
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Ensure Lago API Clock systemd service does not exist
+      ansible.builtin.file:
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api-clock.service"
+        state: absent

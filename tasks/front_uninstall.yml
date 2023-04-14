@@ -1,0 +1,25 @@
+---
+
+- name: Check existence of Lago Front systemd service
+  ansible.builtin.stat:
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-front.service"
+  register: lago_front_service_stat
+
+- when: lago_front_service_stat.stat.exists | bool
+  block:
+    - name: Ensure Lago Front systemd service is stopped
+      ansible.builtin.service:
+        name: "{{ lago_identifier }}-front"
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Ensure Lago Front systemd service does not exist
+      ansible.builtin.file:
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-front.service"
+        state: absent
+
+    - name: Ensure Lago path doesn't exist
+      ansible.builtin.file:
+        path: "{{ lago_front_base_path }}"
+        state: absent

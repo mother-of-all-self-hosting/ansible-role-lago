@@ -1,0 +1,56 @@
+#jinja2: lstrip_blocks: "True"
+[Unit]
+Description=Lago API ({{ lago_identifier }}-api)
+{% for service in lago_api_systemd_required_services_list %}
+Requires={{ service }}
+After={{ service }}
+{% endfor %}
+DefaultDependencies=no
+
+[Service]
+Type=simple
+Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} kill {{ lago_identifier }}-api 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_identifier }}-api 2>/dev/null || true'
+
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
+			--rm \
+			--name={{ lago_identifier }}-api \
+			--log-driver=none \
+			--user={{ lago_uid }}:{{ lago_gid }} \
+			--cap-drop=ALL \
+			--read-only \
+			--network={{ lago_api_container_network }} \
+			{% if lago_api_container_http_bind_port %}
+			-p {{ lago_api_container_http_bind_port }}:3000 \
+			{% endif %}
+			--env-file={{ lago_api_base_path }}/env \
+			--label-file={{ lago_api_base_path }}/labels \
+			--mount type=bind,src={{ lago_api_data_path }},dst=/app/storage \
+			{% for volume in lago_api_container_additional_volumes %}
+			--mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
+			{% endfor %}
+			--tmpfs=/app/tmp/cache:rw,noexec,nosuid,size=128m \
+			--tmpfs=/app/tmp/pids:rw,noexec,nosuid,size=128m \
+			--tmpfs=/app/tmp/sockets:rw,noexec,nosuid,size=128m \
+			--tmpfs=/app/log:rw,noexec,nosuid,size=128m \
+			{% for arg in lago_api_container_extra_arguments %}
+			{{ arg }} \
+			{% endfor %}
+			{{ lago_api_container_image }}
+
+{% for network in lago_api_container_additional_networks %}
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ lago_identifier }}-api
+{% endfor %}
+
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ lago_identifier }}-api
+
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} kill {{ lago_identifier }}-api 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_identifier }}-api 2>/dev/null || true'
+
+Restart=always
+RestartSec=30
+SyslogIdentifier={{ lago_identifier }}-api
+
+[Install]
+WantedBy=multi-user.target

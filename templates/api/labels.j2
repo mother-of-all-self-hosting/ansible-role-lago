@@ -1,0 +1,52 @@
+{% if lago_api_container_labels_traefik_enabled %}
+traefik.enable=true
+
+{% if lago_api_container_labels_traefik_docker_network %}
+traefik.docker.network={{ lago_api_container_labels_traefik_docker_network }}
+{% endif %}
+
+{% set middlewares = [] %}
+
+{% if lago_api_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ lago_identifier }}-api-slashless-redirect.redirectregex.regex=^({{ lago_api_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ lago_identifier }}-api-slashless-redirect.redirectregex.replacement=${1}/
+{% set middlewares = middlewares + [lago_identifier + '-api-slashless-redirect'] %}
+{% endif %}
+
+{% if lago_api_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ lago_identifier }}-api-strip-prefix.stripprefix.prefixes={{ lago_api_container_labels_traefik_path_prefix }}
+{% set middlewares = middlewares + [lago_identifier + '-api-strip-prefix'] %}
+{% endif %}
+
+{% if lago_api_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
+{% for name, value in lago_api_container_labels_traefik_additional_request_headers.items() %}
+traefik.http.middlewares.{{ lago_identifier }}-api-add-request-headers.headers.customrequestheaders.{{ name }}={{ value }}
+{% endfor %}
+{% set middlewares = middlewares + [lago_identifier + '-api-add-request-headers'] %}
+{% endif %}
+
+{% if lago_api_container_labels_traefik_additional_response_headers.keys() | length > 0 %}
+{% for name, value in lago_api_container_labels_traefik_additional_response_headers.items() %}
+traefik.http.middlewares.{{ lago_identifier }}-api-add-response-headers.headers.customresponseheaders.{{ name }}={{ value }}
+{% endfor %}
+{% set middlewares = middlewares + [lago_identifier + '-api-add-response-headers'] %}
+{% endif %}
+
+traefik.http.routers.{{ lago_identifier }}-api.rule={{ lago_api_container_labels_traefik_rule }}
+{% if lago_api_container_labels_traefik_priority | int > 0 %}
+traefik.http.routers.{{ lago_identifier }}-api.priority={{ lago_api_container_labels_traefik_priority }}
+{% endif %}
+traefik.http.routers.{{ lago_identifier }}-api.service={{ lago_identifier }}-api
+{% if middlewares | length > 0 %}
+traefik.http.routers.{{ lago_identifier }}-api.middlewares={{ middlewares | join(',') }}
+{% endif %}
+traefik.http.routers.{{ lago_identifier }}-api.entrypoints={{ lago_api_container_labels_traefik_entrypoints }}
+traefik.http.routers.{{ lago_identifier }}-api.tls={{ lago_api_container_labels_traefik_tls | to_json }}
+{% if lago_api_container_labels_traefik_tls %}
+traefik.http.routers.{{ lago_identifier }}-api.tls.certResolver={{ lago_api_container_labels_traefik_tls_certResolver }}
+{% endif %}
+
+traefik.http.services.{{ lago_identifier }}-api.loadbalancer.server.port=3000
+{% endif %}
+
+{{ lago_api_container_labels_additional_labels }}

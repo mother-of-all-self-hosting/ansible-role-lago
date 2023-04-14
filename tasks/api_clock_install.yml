@@ -1,0 +1,6 @@
+---
+
+- name: Ensure Lago API Clock systemd service is present
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/api-clock/systemd/lago-api-clock.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api-clock.service"

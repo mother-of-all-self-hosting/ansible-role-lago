@@ -1,0 +1,50 @@
+---
+
+- block:
+    - when: lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
+
+    - when: lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/base_install.yml"
+
+    - when: lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_install.yml"
+
+    - when: lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_worker_install.yml"
+
+    - when: lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_clock_install.yml"
+
+    - when: lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/front_install.yml"
+
+    - when: lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/pdf_install.yml"
+  tags:
+    - setup-all
+    - setup-lago
+    - install-all
+    - install-lago
+
+- block:
+    - when: not lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_worker_uninstall.yml"
+
+    - when: not lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_clock_uninstall.yml"
+
+    - when: not lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_uninstall.yml"
+
+    - when: not lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/front_uninstall.yml"
+
+    - when: not lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/pdf_uninstall.yml"
+
+    - when: not lago_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/base_uninstall.yml"
+  tags:
+    - setup-all
+    - setup-lago
