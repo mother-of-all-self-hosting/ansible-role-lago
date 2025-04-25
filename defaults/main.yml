@@ -4,7 +4,7 @@
 
 ---
 
-# Project source code URL: https://github.com/lago/lago
+# Project source code URL: https://github.com/getlago/lago
 
 lago_enabled: true
 
@@ -15,6 +15,7 @@ lago_architecture: ''
 lago_uid: ''
 lago_gid: ''
 
+# renovate: datasource=docker depName=getlago/api versioning=semver
 lago_version: v0.50.0-beta
 
 lago_scheme: https
