@@ -4,7 +4,7 @@
 
 ---
 
-- name: Ensure Lago base path doesn't exist
+- name: Ensure Lago path does not exist
   ansible.builtin.file:
     path: "{{ lago_base_path }}"
     state: absent
