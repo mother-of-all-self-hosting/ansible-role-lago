@@ -4,26 +4,34 @@
 
 ---
 
-- block:
-    - when: lago_enabled | bool
+- name: Perform Lago installation tasks
+  block:
+    - name: Validate Lago configuration
+      when: lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
 
-    - when: lago_enabled | bool
+    - name: Install Lago base
+      when: lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/base_install.yml"
 
-    - when: lago_enabled | bool
+    - name: Install Lago API
+      when: lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_install.yml"
 
-    - when: lago_enabled | bool
+    - name: Install Lago API Worker
+      when: lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_worker_install.yml"
 
-    - when: lago_enabled | bool
+    - name: Install Lago API Clock
+      when: lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_clock_install.yml"
 
-    - when: lago_enabled | bool
+    - name: Install Lago Front
+      when: lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/front_install.yml"
 
-    - when: lago_enabled | bool
+    - name: Install Lago PDF
+      when: lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/pdf_install.yml"
   tags:
     - setup-all
@@ -31,23 +39,30 @@
     - install-all
     - install-lago
 
-- block:
-    - when: not lago_enabled | bool
+- name: Perform Lago uninstallation tasks
+  block:
+    - name: Uninstall Lago API Worker
+      when: not lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_worker_uninstall.yml"
 
-    - when: not lago_enabled | bool
+    - name: Uninstall Lago API Clock
+      when: not lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_clock_uninstall.yml"
 
-    - when: not lago_enabled | bool
+    - name: Uninstall Lago API
+      when: not lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/api_uninstall.yml"
 
-    - when: not lago_enabled | bool
+    - name: Uninstall Lago Front
+      when: not lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/front_uninstall.yml"
 
-    - when: not lago_enabled | bool
+    - name: Uninstall Lago PDF
+      when: not lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/pdf_uninstall.yml"
 
-    - when: not lago_enabled | bool
+    - name: Uninstall Lago base
+      when: not lago_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/base_uninstall.yml"
   tags:
     - setup-all
