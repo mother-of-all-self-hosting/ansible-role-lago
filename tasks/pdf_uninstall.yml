@@ -25,5 +25,5 @@
 
     - name: Ensure Lago path does not exist
       ansible.builtin.file:
-        path: "{{ lago_-pdf_base_path }}"
+        path: "{{ lago_pdf_base_path }}"
         state: absent
