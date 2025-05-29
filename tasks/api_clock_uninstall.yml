@@ -3,13 +3,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
 - name: Check existence of Lago API Clock systemd service
   ansible.builtin.stat:
     path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api-clock.service"
   register: lago_api_clock_service_stat
 
-- when: lago_api_clock_service_stat.stat.exists | bool
+- name: Uninstall Lago API Clock systemd services and files
+  when: lago_api_clock_service_stat.stat.exists | bool
   block:
     - name: Ensure Lago API Clock systemd service is stopped
       ansible.builtin.service:

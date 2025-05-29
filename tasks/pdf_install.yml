@@ -3,12 +3,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
-- name: Ensure Lago PDF paths exist
+- name: Ensure Lago PDF path exists
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: 0750
+    mode: "0750"
     owner: "{{ lago_uid }}"
     group: "{{ lago_gid }}"
   with_items:
@@ -18,7 +17,7 @@
   ansible.builtin.template:
     src: "{{ role_path }}/templates/pdf/{{ item }}.j2"
     dest: "{{ lago_pdf_base_path }}/{{ item }}"
-    mode: 0640
+    mode: "0640"
     owner: "{{ lago_uid }}"
     group: "{{ lago_gid }}"
   with_items:
@@ -45,3 +44,4 @@
   ansible.builtin.template:
     src: "{{ role_path }}/templates/pdf/systemd/lago-pdf.service.j2"
     dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-pdf.service"
+    mode: "0644"

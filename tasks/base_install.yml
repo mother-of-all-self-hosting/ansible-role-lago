@@ -3,12 +3,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
-- name: Ensure Lago paths exist
+- name: Ensure Lago path exists
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: 0750
+    mode: "0750"
     owner: "{{ lago_uid }}"
     group: "{{ lago_gid }}"
   with_items:

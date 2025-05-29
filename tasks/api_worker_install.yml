@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
 - name: Ensure Lago API Worker systemd service is present
   ansible.builtin.template:
     src: "{{ role_path }}/templates/api-worker/systemd/lago-api-worker.service.j2"
     dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api-worker.service"
+    mode: "0644"
