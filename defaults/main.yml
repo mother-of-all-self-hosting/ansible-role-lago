@@ -202,7 +202,7 @@ lago_api_environment_variables_additional_variables: ''
 
 # List of systemd services that lago-api.service depends on
 lago_api_systemd_required_services_list: "{{ lago_api_systemd_required_systemd_services_list_default + lago_api_systemd_required_systemd_services_list_auto + lago_api_systemd_required_systemd_services_list_custom }}"
-lago_api_systemd_required_systemd_services_list_default: ['docker.service']
+lago_api_systemd_required_systemd_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
 lago_api_systemd_required_systemd_services_list_auto: []
 lago_api_systemd_required_systemd_services_list_custom: []
 
@@ -316,7 +316,7 @@ lago_front_environment_variables_additional_variables: ''
 
 # List of systemd services that lago-api.service depends on
 lago_front_systemd_required_services_list: "{{ lago_front_systemd_required_systemd_services_list_default + lago_front_systemd_required_systemd_services_list_auto + lago_front_systemd_required_systemd_services_list_custom }}"
-lago_front_systemd_required_systemd_services_list_default: ['docker.service']
+lago_front_systemd_required_systemd_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
 lago_front_systemd_required_systemd_services_list_auto: []
 lago_front_systemd_required_systemd_services_list_custom: []
 
@@ -408,7 +408,7 @@ lago_pdf_environment_variables_additional_variables: ''
 
 # List of systemd services that lago-api.service depends on
 lago_pdf_systemd_required_services_list: "{{ lago_pdf_systemd_required_systemd_services_list_default + lago_pdf_systemd_required_systemd_services_list_auto + lago_pdf_systemd_required_systemd_services_list_custom }}"
-lago_pdf_systemd_required_systemd_services_list_default: ['docker.service']
+lago_pdf_systemd_required_systemd_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
 lago_pdf_systemd_required_systemd_services_list_auto: []
 lago_pdf_systemd_required_systemd_services_list_custom: []
 
