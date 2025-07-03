@@ -36,7 +36,7 @@
   until: result is not failed
 
 - name: Ensure Lago PDF container network is created
-  community.general.docker_network:
+  community.docker.docker_network:
     name: "{{ lago_pdf_container_network }}"
     driver: bridge
 
