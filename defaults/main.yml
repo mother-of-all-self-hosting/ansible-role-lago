@@ -90,7 +90,7 @@ lago_api_container_labels_traefik_tls: "{{ lago_api_container_labels_traefik_ent
 lago_api_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 
 # Controls which additional headers to attach to all HTTP requests.
-# To add your own custom request headers, use `lago_api_container_labels_traefik_additional_response_headers_custom`
+# To add your own custom request headers, use `lago_api_container_labels_traefik_additional_request_headers_custom`
 lago_api_container_labels_traefik_additional_request_headers: "{{ lago_api_container_labels_traefik_additional_request_headers_auto | combine(lago_api_container_labels_traefik_additional_request_headers_custom) }}"
 lago_api_container_labels_traefik_additional_request_headers_auto: {}
 lago_api_container_labels_traefik_additional_request_headers_custom: {}
@@ -243,7 +243,7 @@ lago_front_container_labels_traefik_tls: "{{ lago_front_container_labels_traefik
 lago_front_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 
 # Controls which additional headers to attach to all HTTP requests.
-# To add your own custom request headers, use `lago_front_container_labels_traefik_additional_response_headers_custom`
+# To add your own custom request headers, use `lago_front_container_labels_traefik_additional_request_headers_custom`
 lago_front_container_labels_traefik_additional_request_headers: "{{ lago_front_container_labels_traefik_additional_request_headers_auto | combine(lago_front_container_labels_traefik_additional_request_headers_custom) }}"
 lago_front_container_labels_traefik_additional_request_headers_auto: {}
 lago_front_container_labels_traefik_additional_request_headers_custom: {}
@@ -357,7 +357,7 @@ lago_pdf_container_labels_traefik_tls: "{{ lago_pdf_container_labels_traefik_ent
 lago_pdf_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 
 # Controls which additional headers to attach to all HTTP requests.
-# To add your own custom request headers, use `lago_pdf_container_labels_traefik_additional_response_headers_custom`
+# To add your own custom request headers, use `lago_pdf_container_labels_traefik_additional_request_headers_custom`
 lago_pdf_container_labels_traefik_additional_request_headers: "{{ lago_pdf_container_labels_traefik_additional_request_headers_auto | combine(lago_pdf_container_labels_traefik_additional_request_headers_custom) }}"
 lago_pdf_container_labels_traefik_additional_request_headers_auto: {}
 lago_pdf_container_labels_traefik_additional_request_headers_custom: {}
