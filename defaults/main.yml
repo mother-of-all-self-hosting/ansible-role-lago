@@ -75,7 +75,7 @@ lago_api_container_http_bind_port: ''
 # lago_api_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
 # See `../templates/api/labels.j2` for details.
 #
-# To inject your own other container labels, see `lago_api_container_labels_additional_labels`.
+# To inject your own other container labels, see `lago_api_container_labels_additional_labels_custom`.
 lago_api_container_labels_traefik_enabled: "{{ lago_container_labels_traefik_enabled }}"
 lago_api_container_labels_traefik_docker_network: "{{ lago_container_labels_traefik_docker_network }}"
 lago_api_container_labels_traefik_hostname: "{{ lago_container_labels_traefik_hostname }}"
@@ -230,7 +230,7 @@ lago_front_container_http_bind_port: ''
 # lago_front_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
 # See `../templates/front/labels.j2` for details.
 #
-# To inject your own other container labels, see `lago_front_container_labels_additional_labels`.
+# To inject your own other container labels, see `lago_front_container_labels_additional_labels_custom`.
 lago_front_container_labels_traefik_enabled: "{{ lago_container_labels_traefik_enabled }}"
 lago_front_container_labels_traefik_docker_network: "{{ lago_container_labels_traefik_docker_network }}"
 lago_front_container_labels_traefik_hostname: "{{ lago_container_labels_traefik_hostname }}"
@@ -344,7 +344,7 @@ lago_pdf_container_http_bind_port: ''
 # lago_pdf_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
 # See `../templates/pdf/labels.j2` for details.
 #
-# To inject your own other container labels, see `lago_pdf_container_labels_additional_labels`.
+# To inject your own other container labels, see `lago_pdf_container_labels_additional_labels_custom`.
 lago_pdf_container_labels_traefik_enabled: false
 lago_pdf_container_labels_traefik_docker_network: "{{ lago_container_labels_traefik_docker_network }}"
 lago_pdf_container_labels_traefik_hostname: "{{ lago_container_labels_traefik_hostname }}"
