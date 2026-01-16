@@ -133,6 +133,9 @@ lago_api_container_labels_additional_labels: ''
 #     options: readonly
 lago_api_container_additional_volumes: []
 
+# Specify the size of the container's tmpfs volume
+lago_pdf_container_tmpfs_tmp_size: 512m
+
 # A list of extra arguments to pass to the container
 lago_api_container_extra_arguments: []
 
