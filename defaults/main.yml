@@ -67,9 +67,9 @@ lago_api_container_additional_networks: "{{ lago_api_container_additional_networ
 lago_api_container_additional_networks_auto: []
 lago_api_container_additional_networks_custom: []
 
-# Specifies how the container publishes its HTTP port
+# Specify how the container publishes its HTTP port
 #
-# Takes an "<ip>:<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
+# Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
 lago_api_container_http_bind_port: ''
 
 # lago_api_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
@@ -225,9 +225,9 @@ lago_front_container_additional_networks: "{{ lago_front_container_additional_ne
 lago_front_container_additional_networks_auto: []
 lago_front_container_additional_networks_custom: []
 
-# Specifies how the container publishes its HTTP port
+# Specify how the container publishes its HTTP port
 #
-# Takes an "<ip>:<port>" value (e.g. "127.0.0.1:80"), just a port number or an empty string to not expose.
+# Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:80"), just a port number or an empty string to not expose.
 lago_front_container_http_bind_port: ''
 
 # lago_front_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
@@ -339,9 +339,9 @@ lago_pdf_container_additional_networks: "{{ lago_pdf_container_additional_networ
 lago_pdf_container_additional_networks_auto: []
 lago_pdf_container_additional_networks_custom: []
 
-# Specifies how the container publishes its HTTP port
+# Specify how the container publishes its HTTP port
 #
-# Takes an "<ip>:<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
+# Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
 lago_pdf_container_http_bind_port: ''
 
 # lago_pdf_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
