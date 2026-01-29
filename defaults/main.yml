@@ -16,7 +16,7 @@ lago_uid: ''
 lago_gid: ''
 
 # renovate: datasource=docker depName=getlago/api versioning=semver
-lago_version: v0.50.0-beta
+lago_version: v1.41.0
 
 lago_scheme: https
 
