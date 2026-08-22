@@ -52,7 +52,7 @@ traefik.http.routers.{{ lago_identifier }}-front.tls={{ lago_front_container_lab
 traefik.http.routers.{{ lago_identifier }}-front.tls.certResolver={{ lago_front_container_labels_traefik_tls_certResolver }}
 {% endif %}
 
-traefik.http.services.{{ lago_identifier }}-front.loadbalancer.server.port=80
+traefik.http.services.{{ lago_identifier }}-front.loadbalancer.server.port={{ lago_front_container_http_port }}
 {% endif %}
 
 {% for arg in lago_front_container_labels_additional_labels %}
