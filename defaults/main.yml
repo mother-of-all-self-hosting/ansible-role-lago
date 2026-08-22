@@ -121,6 +121,9 @@ lago_redis_cache_hostname: "{{ lago_redis_hostname }}"
 lago_redis_cache_port: "{{ lago_redis_port }}"
 lago_redis_cache_password: "{{ lago_redis_password }}"
 
+# Specify the timezone
+lago_environment_variables_tz: UTC
+
 ########################################################################
 #                                                                      #
 # api                                                                  #
