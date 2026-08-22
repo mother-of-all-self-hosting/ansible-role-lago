@@ -306,6 +306,17 @@ lago_api_environment_variables_additional_variables: ""
 
 lago_api_clock_identifier: "{{ lago_identifier }}-api-clock"
 
+# List of systemd services that the lago-api-clock.service depends on
+lago_api_clock_systemd_required_services_list: "{{ lago_api_clock_systemd_required_services_list_default + lago_api_clock_systemd_required_services_list_auto + lago_api_clock_systemd_required_services_list_custom }}"
+lago_api_clock_systemd_required_services_list_default: |
+  {{
+    ([devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [])
+    +
+    ([lago_api_identifier ~ '.service'])
+  }}
+lago_api_clock_systemd_required_services_list_auto: []
+lago_api_clock_systemd_required_services_list_custom: []
+
 ########################################################################
 #                                                                      #
 # /api_clock                                                           #
@@ -319,6 +330,17 @@ lago_api_clock_identifier: "{{ lago_identifier }}-api-clock"
 ########################################################################
 
 lago_api_worker_identifier: "{{ lago_identifier }}-api-worker"
+
+# List of systemd services that the lago-api-worker.service depends on
+lago_api_worker_systemd_required_services_list: "{{ lago_api_worker_systemd_required_services_list_default + lago_api_worker_systemd_required_services_list_auto + lago_api_worker_systemd_required_services_list_custom }}"
+lago_api_worker_systemd_required_services_list_default: |
+  {{
+    ([devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [])
+    +
+    ([lago_api_identifier ~ '.service'])
+  }}
+lago_api_worker_systemd_required_services_list_auto: []
+lago_api_worker_systemd_required_services_list_custom: []
 
 ########################################################################
 #                                                                      #
