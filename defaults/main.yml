@@ -56,7 +56,6 @@ lago_api_data_path: "{{ lago_base_path }}/data"
 lago_api_container_image: "{{ lago_api_container_image_registry_prefix }}getlago/api{{ lago_container_image_repository_name_suffix }}:{{ lago_api_container_image_tag }}"
 lago_api_container_image_registry_prefix: docker.io/
 lago_api_container_image_tag: "{{ lago_version }}"
-lago_api_container_image_force_pull: "{{ lago_api_container_image.endswith(':latest') }}"
 
 lago_api_container_network: "{{ lago_container_network }}"
 
@@ -214,7 +213,6 @@ lago_front_base_path: "{{ lago_base_path }}/front"
 lago_front_container_image: "{{ lago_front_container_image_registry_prefix }}getlago/front{{ lago_container_image_repository_name_suffix }}:{{ lago_front_container_image_tag }}"
 lago_front_container_image_registry_prefix: docker.io/
 lago_front_container_image_tag: "{{ lago_version }}"
-lago_front_container_image_force_pull: "{{ lago_front_container_image.endswith(':latest') }}"
 
 lago_front_container_network: "{{ lago_container_network }}"
 
@@ -328,7 +326,6 @@ lago_pdf_base_path: "{{ lago_base_path }}/pdf"
 lago_pdf_container_image: "{{ lago_pdf_container_image_registry_prefix }}getlago/lago-gotenberg{{ lago_container_image_repository_name_suffix }}:{{ lago_pdf_container_image_tag }}"
 lago_pdf_container_image_registry_prefix: docker.io/
 lago_pdf_container_image_tag: 7
-lago_pdf_container_image_force_pull: "{{ lago_pdf_container_image.endswith(':latest') }}"
 
 lago_pdf_container_network: "{{ lago_container_network }}"
 
