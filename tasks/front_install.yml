@@ -68,5 +68,5 @@
 - name: Ensure Lago Front systemd service is present
   ansible.builtin.template:
     src: "{{ role_path }}/templates/front/systemd/lago-front.service.j2"
-    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-front.service"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_front_identifier }}.service"
     mode: "0644"

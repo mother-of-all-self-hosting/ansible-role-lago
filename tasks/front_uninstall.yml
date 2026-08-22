@@ -5,7 +5,7 @@
 ---
 - name: Check existence of Lago Front systemd service
   ansible.builtin.stat:
-    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-front.service"
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_front_identifier }}.service"
   register: lago_front_service_stat
 
 - name: Uninstall Lago Front systemd services and files
@@ -13,14 +13,14 @@
   block:
     - name: Ensure Lago Front systemd service is stopped
       ansible.builtin.service:
-        name: "{{ lago_identifier }}-front"
+        name: "{{ lago_front_identifier }}"
         state: stopped
         enabled: false
         daemon_reload: true
 
     - name: Ensure Lago Front systemd service does not exist
       ansible.builtin.file:
-        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-front.service"
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_front_identifier }}.service"
         state: absent
 
     - name: Ensure Lago path does not exist

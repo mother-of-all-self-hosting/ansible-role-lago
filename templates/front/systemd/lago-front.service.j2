@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
 [Unit]
-Description=Lago Front ({{ lago_identifier }}-front)
+Description=Lago Front ({{ lago_front_identifier }})
 {% for service in lago_front_systemd_required_services_list %}
 Requires={{ service }}
 After={{ service }}
@@ -15,8 +15,8 @@ DefaultDependencies=no
 [Service]
 Type=simple
 Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_identifier }}-front 2>/dev/null || true'
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_identifier }}-front 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_front_identifier }} 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_front_identifier }} 2>/dev/null || true'
 
 {#
   Not using `--read-only` or a `--user` because of:
@@ -25,7 +25,7 @@ ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_s
 #}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
-      --name={{ lago_identifier }}-front \
+      --name={{ lago_front_identifier }} \
       --log-driver=none \
       --network={{ lago_front_container_network }} \
       {% if lago_front_container_http_host_bind_port %}
@@ -42,17 +42,17 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {{ lago_front_container_image }}
 
 {% for network in lago_front_container_additional_networks %}
-ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ lago_identifier }}-front
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ lago_front_identifier }}
 {% endfor %}
 
-ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ lago_identifier }}-front
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ lago_front_identifier }}
 
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_identifier }}-front 2>/dev/null || true'
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_identifier }}-front 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_front_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_front_identifier }} 2>/dev/null || true'
 
 Restart=always
 RestartSec=30
-SyslogIdentifier={{ lago_identifier }}-front
+SyslogIdentifier={{ lago_front_identifier }}
 
 [Install]
 WantedBy=multi-user.target
