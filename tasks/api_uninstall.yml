@@ -5,7 +5,7 @@
 ---
 - name: Check existence of Lago API systemd service
   ansible.builtin.stat:
-    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api.service"
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_api_identifier }}.service"
   register: lago_api_service_stat
 
 - name: Uninstall Lago API systemd services and files
@@ -13,14 +13,14 @@
   block:
     - name: Ensure Lago API systemd service is stopped
       ansible.builtin.service:
-        name: "{{ lago_identifier }}-api"
+        name: "{{ lago_api_identifier }}"
         state: stopped
         enabled: false
         daemon_reload: true
 
     - name: Ensure Lago API systemd service does not exist
       ansible.builtin.file:
-        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api.service"
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_api_identifier }}.service"
         state: absent
 
     - name: Ensure Lago API path does not exist

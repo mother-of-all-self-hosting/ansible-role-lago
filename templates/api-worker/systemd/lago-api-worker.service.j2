@@ -6,13 +6,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 [Unit]
 Description=Lago API Worker ({{ lago_identifier }}-api-worker)
-Requires={{ lago_identifier }}-api.service
-After={{ lago_identifier }}-api.service
+Requires={{ lago_api_identifier }}.service
+After={{ lago_api_identifier }}.service
 DefaultDependencies=no
 
 [Service]
 Type=simple
-ExecStart={{ devture_systemd_docker_base_host_command_docker }} exec {{ lago_identifier }}-api ./scripts/start.worker.sh
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} exec {{ lago_api_identifier }} ./scripts/start.worker.sh
 Restart=always
 RestartSec=30
 SyslogIdentifier={{ lago_identifier }}-api-worker

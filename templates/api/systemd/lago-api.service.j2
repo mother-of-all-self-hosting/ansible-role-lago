@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
 [Unit]
-Description=Lago API ({{ lago_identifier }}-api)
+Description=Lago API ({{ lago_api_identifier }})
 {% for service in lago_api_systemd_required_services_list %}
 Requires={{ service }}
 After={{ service }}
@@ -20,7 +20,7 @@ ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_s
 
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
-      --name={{ lago_identifier }}-api \
+      --name={{ lago_api_identifier }} \
       --log-driver=none \
       --user={{ lago_uid }}:{{ lago_gid }} \
       --cap-drop=ALL \
@@ -45,17 +45,17 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {{ lago_api_container_image }}
 
 {% for network in lago_api_container_additional_networks %}
-ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ lago_identifier }}-api
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ lago_api_identifier }}
 {% endfor %}
 
-ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ lago_identifier }}-api
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ lago_api_identifier }}
 
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_identifier }}-api 2>/dev/null || true'
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_identifier }}-api 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_api_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_api_identifier }} 2>/dev/null || true'
 
 Restart=always
 RestartSec=30
-SyslogIdentifier={{ lago_identifier }}-api
+SyslogIdentifier={{ lago_api_identifier }}
 
 [Install]
 WantedBy=multi-user.target

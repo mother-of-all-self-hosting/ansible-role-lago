@@ -133,6 +133,8 @@ lago_environment_variables_tz: UTC
 #                                                                      #
 ########################################################################
 
+lago_api_identifier: "{{ lago_identifier }}-api"
+
 lago_api_relative_path_prefix: /api
 lago_api_path_prefix: "{{ '' if lago_path_prefix == '/' else lago_path_prefix }}{{ lago_api_relative_path_prefix }}"
 

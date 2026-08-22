@@ -69,5 +69,5 @@
 - name: Ensure Lago API systemd service is present
   ansible.builtin.template:
     src: "{{ role_path }}/templates/api/systemd/lago-api.service.j2"
-    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api.service"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_api_identifier }}.service"
     mode: "0644"
