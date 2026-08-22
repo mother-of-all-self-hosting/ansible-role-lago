@@ -222,11 +222,17 @@ lago_api_container_extra_arguments: "{{ lago_api_container_extra_arguments_auto 
 lago_api_container_extra_arguments_auto: []
 lago_api_container_extra_arguments_custom: []
 
-# List of systemd services that the lago-api.service depends on
+# List of systemd services that the Lago API systemd service depends on
 lago_api_systemd_required_services_list: "{{ lago_api_systemd_required_services_list_default + lago_api_systemd_required_services_list_auto + lago_api_systemd_required_services_list_custom }}"
 lago_api_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
 lago_api_systemd_required_services_list_auto: []
 lago_api_systemd_required_services_list_custom: []
+
+# List of systemd services that the Lago API systemd service wants
+lago_api_systemd_wanted_services_list: "{{ lago_api_systemd_wanted_services_list_default + lago_api_systemd_wanted_services_list_auto + lago_api_systemd_wanted_services_list_custom }}"
+lago_api_systemd_wanted_services_list_default: []
+lago_api_systemd_wanted_services_list_auto: []
+lago_api_systemd_wanted_services_list_custom: []
 
 # Controls the LAGO_RSA_PRIVATE_KEY environment variable
 # This is to be generated with: `openssl genrsa 2048 | base64 --wrap=0`
@@ -306,7 +312,7 @@ lago_api_environment_variables_additional_variables: ""
 
 lago_api_clock_identifier: "{{ lago_identifier }}-api-clock"
 
-# List of systemd services that the lago-api-clock.service depends on
+# List of systemd services that the Lago API clock systemd service depends on
 lago_api_clock_systemd_required_services_list: "{{ lago_api_clock_systemd_required_services_list_default + lago_api_clock_systemd_required_services_list_auto + lago_api_clock_systemd_required_services_list_custom }}"
 lago_api_clock_systemd_required_services_list_default: |
   {{
@@ -316,6 +322,12 @@ lago_api_clock_systemd_required_services_list_default: |
   }}
 lago_api_clock_systemd_required_services_list_auto: []
 lago_api_clock_systemd_required_services_list_custom: []
+
+# List of systemd services that the Lago API clock systemd service wants
+lago_api_clock_systemd_wanted_services_list: "{{ lago_api_clock_systemd_wanted_services_list_default + lago_api_clock_systemd_wanted_services_list_auto + lago_api_clock_systemd_wanted_services_list_custom }}"
+lago_api_clock_systemd_wanted_services_list_default: []
+lago_api_clock_systemd_wanted_services_list_auto: []
+lago_api_clock_systemd_wanted_services_list_custom: []
 
 ########################################################################
 #                                                                      #
@@ -331,7 +343,7 @@ lago_api_clock_systemd_required_services_list_custom: []
 
 lago_api_worker_identifier: "{{ lago_identifier }}-api-worker"
 
-# List of systemd services that the lago-api-worker.service depends on
+# List of systemd services that the Lago API worker systemd service depends on
 lago_api_worker_systemd_required_services_list: "{{ lago_api_worker_systemd_required_services_list_default + lago_api_worker_systemd_required_services_list_auto + lago_api_worker_systemd_required_services_list_custom }}"
 lago_api_worker_systemd_required_services_list_default: |
   {{
@@ -341,6 +353,12 @@ lago_api_worker_systemd_required_services_list_default: |
   }}
 lago_api_worker_systemd_required_services_list_auto: []
 lago_api_worker_systemd_required_services_list_custom: []
+
+# List of systemd services that the Lago API worker systemd service wants
+lago_api_worker_systemd_wanted_services_list: "{{ lago_api_worker_systemd_wanted_services_list_default + lago_api_worker_systemd_wanted_services_list_auto + lago_api_worker_systemd_wanted_services_list_custom }}"
+lago_api_worker_systemd_wanted_services_list_default: []
+lago_api_worker_systemd_wanted_services_list_auto: []
+lago_api_worker_systemd_wanted_services_list_custom: []
 
 ########################################################################
 #                                                                      #
@@ -438,11 +456,17 @@ lago_front_container_extra_arguments: "{{ lago_front_container_extra_arguments_a
 lago_front_container_extra_arguments_auto: []
 lago_front_container_extra_arguments_custom: []
 
-# List of systemd services that the lago-front.service depends on
+# List of systemd services that the Lago front systemd service depends on
 lago_front_systemd_required_services_list: "{{ lago_front_systemd_required_services_list_default + lago_front_systemd_required_services_list_auto + lago_front_systemd_required_services_list_custom }}"
 lago_front_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
 lago_front_systemd_required_services_list_auto: []
 lago_front_systemd_required_services_list_custom: []
+
+# List of systemd services that the Lago front systemd service wants
+lago_front_systemd_wanted_services_list: "{{ lago_front_systemd_wanted_services_list_default + lago_front_systemd_wanted_services_list_auto + lago_front_systemd_wanted_services_list_custom }}"
+lago_front_systemd_wanted_services_list_default: []
+lago_front_systemd_wanted_services_list_auto: []
+lago_front_systemd_wanted_services_list_custom: []
 
 # Controls the LAGO_RSA_PRIVATE_KEY environment variable
 # This is to be generated with: `openssl genrsa 2048 | base64 --wrap=0`
@@ -568,11 +592,17 @@ lago_pdf_container_extra_arguments: "{{ lago_pdf_container_extra_arguments_auto 
 lago_pdf_container_extra_arguments_auto: []
 lago_pdf_container_extra_arguments_custom: []
 
-# List of systemd services that the lago-pdf.service depends on
+# List of systemd services that the Lago PDF systemd service depends on
 lago_pdf_systemd_required_services_list: "{{ lago_pdf_systemd_required_services_list_default + lago_pdf_systemd_required_services_list_auto + lago_pdf_systemd_required_services_list_custom }}"
 lago_pdf_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
 lago_pdf_systemd_required_services_list_auto: []
 lago_pdf_systemd_required_services_list_custom: []
+
+# List of systemd services that the Lago PDF systemd service wants
+lago_pdf_systemd_wanted_services_list: "{{ lago_pdf_systemd_wanted_services_list_default + lago_pdf_systemd_wanted_services_list_auto + lago_pdf_systemd_wanted_services_list_custom }}"
+lago_pdf_systemd_wanted_services_list_default: []
+lago_pdf_systemd_wanted_services_list_auto: []
+lago_pdf_systemd_wanted_services_list_custom: []
 
 # Additional environment variables.
 lago_pdf_environment_variables_additional_variables: ""
