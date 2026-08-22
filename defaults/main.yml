@@ -9,14 +9,17 @@
 lago_enabled: true
 
 lago_identifier: lago
-
-lago_architecture: ''
-
-lago_uid: ''
-lago_gid: ''
+lago_base_path: "/{{ lago_identifier }}"
+lago_api_base_path: "{{ lago_base_path }}/api"
+lago_api_data_path: "{{ lago_base_path }}/data"
+lago_front_base_path: "{{ lago_base_path }}/front"
+lago_pdf_base_path: "{{ lago_base_path }}/pdf"
 
 # renovate: datasource=docker depName=getlago/api versioning=semver
 lago_version: v0.50.0-beta
+
+lago_uid: ''
+lago_gid: ''
 
 lago_scheme: https
 
@@ -27,7 +30,7 @@ lago_hostname: ''
 # This value must either be `/` or not end with a slash (e.g. `/lago`).
 lago_path_prefix: /
 
-lago_base_path: "/{{ lago_identifier }}"
+lago_architecture: ''
 
 lago_container_image_repository_name_suffix: |-
   {{
@@ -50,17 +53,86 @@ lago_container_labels_traefik_hostname: "{{ lago_hostname }}"
 lago_container_labels_traefik_path_prefix: "{{ lago_path_prefix }}"
 lago_container_labels_traefik_entrypoints: web-secure
 
+# Specifies the value of the `X-XSS-Protection` header
+# Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
+#
+# Learn more about it is here:
+# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+# - https://portswigger.net/web-security/cross-site-scripting/reflected
+lago_http_header_xss_protection: "1; mode=block"
+
+# Specifies the value of the `X-Content-Type-Options` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
+lago_http_header_content_type_options: nosniff
+
+# Specifies the value of the `Content-Security-Policy` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+lago_http_header_content_security_policy: frame-ancestors 'self'
+
+# Specifies the value of the `Permissions-Policy` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
+lago_http_header_permissions_policy: "{{ 'interest-cohort=()' if lago_floc_optout_enabled else '' }}"
+
+# Specifies the value of the `Strict-Transport-Security` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+lago_http_header_strict_transport_security: "max-age=31536000; includeSubDomains{{ '; preload' if lago_hsts_preload_enabled else '' }}"
+
+# Controls whether to send a "Permissions-Policy interest-cohort=();" header along with all responses
+#
+# Learn more about what it is here:
+# - https://www.eff.org/deeplinks/2021/03/googles-floc-terrible-idea
+# - https://paramdeo.com/blog/opting-your-website-out-of-googles-floc-network
+# - https://amifloced.org/
+#
+# Of course, a better solution is to just stop using browsers (like Chrome), which participate in such tracking practices.
+# See: `lago_http_header_permissions_policy`
+lago_floc_optout_enabled: true
+
+# Controls if HSTS preloading is enabled
+#
+# In its strongest and recommended form, the [HSTS policy](https://www.chromium.org/hsts) includes all subdomains, and
+# indicates a willingness to be "preloaded" into browsers:
+# `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`
+# For more information visit:
+# - https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
+# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+# - https://hstspreload.org/#opt-in
+# See: `lago_http_header_strict_transport_security`
+lago_hsts_preload_enabled: false
+
+lago_database_username: lago
+lago_database_password: ''
+lago_database_hostname: ''
+lago_database_port: 5432
+lago_database_name: lago
+
+lago_redis_hostname: ''
+lago_redis_port: 6379
+lago_redis_password: ''
+
+lago_redis_cache_hostname: "{{ lago_redis_hostname }}"
+lago_redis_cache_port: "{{ lago_redis_port }}"
+lago_redis_cache_password: "{{ lago_redis_password }}"
+
+########################################################################
+#                                                                      #
+# api                                                                  #
+#                                                                      #
+########################################################################
+
 lago_api_relative_path_prefix: /api
 lago_api_path_prefix: "{{ '' if lago_path_prefix == '/' else lago_path_prefix }}{{ lago_api_relative_path_prefix }}"
 
-lago_api_base_path: "{{ lago_base_path }}/api"
-lago_api_data_path: "{{ lago_base_path }}/data"
-
 lago_api_container_image: "{{ lago_api_container_image_registry_prefix }}getlago/api{{ lago_container_image_repository_name_suffix }}:{{ lago_api_container_image_tag }}"
-lago_api_container_image_registry_prefix: docker.io/
 lago_api_container_image_tag: "{{ lago_version }}"
+lago_api_container_image_registry_prefix: docker.io/
 
 lago_api_container_network: "{{ lago_container_network }}"
+
+# Specify how the container publishes its HTTP port
+#
+# Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
+lago_api_container_http_host_bind_port: ''
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
@@ -69,10 +141,20 @@ lago_api_container_additional_networks: "{{ lago_api_container_additional_networ
 lago_api_container_additional_networks_auto: []
 lago_api_container_additional_networks_custom: []
 
-# Specify how the container publishes its HTTP port
+# A list of additional "volumes" to mount in the container.
 #
-# Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:3000"), just a port number or an empty string to not expose.
-lago_api_container_http_host_bind_port: ''
+# See the `--mount` documentation for the `docker run` command.
+#
+# Example:
+# lago_api_container_additional_volumes:
+#   - type: bind
+#     src: /path/on/the/host
+#     dst: /data
+#   - type: bind
+#     src: /another-path/on/the/host
+#     dst: /read-only
+#     options: readonly
+lago_api_container_additional_volumes: []
 
 # lago_api_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
 # See `../templates/api/labels.j2` for details.
@@ -123,26 +205,14 @@ lago_api_container_labels_additional_labels: "{{ lago_api_container_labels_addit
 lago_api_container_labels_additional_labels_auto: []
 lago_api_container_labels_additional_labels_custom: []
 
-# A list of additional "volumes" to mount in the container.
-#
-# See the `--mount` documentation for the `docker run` command.
-#
-# Example:
-# lago_api_container_additional_volumes:
-#   - type: bind
-#     src: /path/on/the/host
-#     dst: /data
-#   - type: bind
-#     src: /another-path/on/the/host
-#     dst: /read-only
-#     options: readonly
-lago_api_container_additional_volumes: []
-
-# Specify the size of the container's tmpfs volume
-lago_pdf_container_tmpfs_tmp_size: 512m
-
 # A list of extra arguments to pass to the container
 lago_api_container_extra_arguments: []
+
+# List of systemd services that the lago-api.service depends on
+lago_api_systemd_required_services_list: "{{ lago_api_systemd_required_systemd_services_list_default + lago_api_systemd_required_systemd_services_list_auto + lago_api_systemd_required_systemd_services_list_custom }}"
+lago_api_systemd_required_systemd_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
+lago_api_systemd_required_systemd_services_list_auto: []
+lago_api_systemd_required_systemd_services_list_custom: []
 
 # Controls the LAGO_RSA_PRIVATE_KEY environment variable
 # This is to be generated with: `openssl genrsa 2048 | base64 --wrap=0`
@@ -208,17 +278,21 @@ lago_api_environment_variable_new_relic_agent_enabled: false
 # Additional environment variables.
 lago_api_environment_variables_additional_variables: ''
 
-# List of systemd services that the lago-api.service depends on
-lago_api_systemd_required_services_list: "{{ lago_api_systemd_required_systemd_services_list_default + lago_api_systemd_required_systemd_services_list_auto + lago_api_systemd_required_systemd_services_list_custom }}"
-lago_api_systemd_required_systemd_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
-lago_api_systemd_required_systemd_services_list_auto: []
-lago_api_systemd_required_systemd_services_list_custom: []
+########################################################################
+#                                                                      #
+# /api                                                                 #
+#                                                                      #
+########################################################################
 
-lago_front_base_path: "{{ lago_base_path }}/front"
+########################################################################
+#                                                                      #
+# front                                                                #
+#                                                                      #
+########################################################################
 
 lago_front_container_image: "{{ lago_front_container_image_registry_prefix }}getlago/front{{ lago_container_image_repository_name_suffix }}:{{ lago_front_container_image_tag }}"
-lago_front_container_image_registry_prefix: docker.io/
 lago_front_container_image_tag: "{{ lago_version }}"
+lago_front_container_image_registry_prefix: docker.io/
 
 lago_front_container_network: "{{ lago_container_network }}"
 
@@ -228,6 +302,21 @@ lago_front_container_network: "{{ lago_container_network }}"
 lago_front_container_additional_networks: "{{ lago_front_container_additional_networks_auto + lago_front_container_additional_networks_custom }}"
 lago_front_container_additional_networks_auto: []
 lago_front_container_additional_networks_custom: []
+
+# A list of additional "volumes" to mount in the container.
+#
+# See the `--mount` documentation for the `docker run` command.
+#
+# Example:
+# lago_front_container_additional_volumes:
+#   - type: bind
+#     src: /path/on/the/host
+#     dst: /data
+#   - type: bind
+#     src: /another-path/on/the/host
+#     dst: /read-only
+#     options: readonly
+lago_front_container_additional_volumes: []
 
 # Specify how the container publishes its HTTP port
 #
@@ -281,23 +370,14 @@ lago_front_container_labels_additional_labels: "{{ lago_front_container_labels_a
 lago_front_container_labels_additional_labels_auto: []
 lago_front_container_labels_additional_labels_custom: []
 
-# A list of additional "volumes" to mount in the container.
-#
-# See the `--mount` documentation for the `docker run` command.
-#
-# Example:
-# lago_front_container_additional_volumes:
-#   - type: bind
-#     src: /path/on/the/host
-#     dst: /data
-#   - type: bind
-#     src: /another-path/on/the/host
-#     dst: /read-only
-#     options: readonly
-lago_front_container_additional_volumes: []
-
 # A list of extra arguments to pass to the container
 lago_front_container_extra_arguments: []
+
+# List of systemd services that the lago-front.service depends on
+lago_front_systemd_required_services_list: "{{ lago_front_systemd_required_systemd_services_list_default + lago_front_systemd_required_systemd_services_list_auto + lago_front_systemd_required_systemd_services_list_custom }}"
+lago_front_systemd_required_systemd_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
+lago_front_systemd_required_systemd_services_list_auto: []
+lago_front_systemd_required_systemd_services_list_custom: []
 
 # Controls the LAGO_RSA_PRIVATE_KEY environment variable
 # This is to be generated with: `openssl genrsa 2048 | base64 --wrap=0`
@@ -324,17 +404,21 @@ lago_front_environment_variable_lago_oauth_proxy_url: "{{ lago_api_environment_v
 # Additional environment variables.
 lago_front_environment_variables_additional_variables: ''
 
-# List of systemd services that the lago-front.service depends on
-lago_front_systemd_required_services_list: "{{ lago_front_systemd_required_systemd_services_list_default + lago_front_systemd_required_systemd_services_list_auto + lago_front_systemd_required_systemd_services_list_custom }}"
-lago_front_systemd_required_systemd_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
-lago_front_systemd_required_systemd_services_list_auto: []
-lago_front_systemd_required_systemd_services_list_custom: []
+########################################################################
+#                                                                      #
+# /front                                                               #
+#                                                                      #
+########################################################################
 
-lago_pdf_base_path: "{{ lago_base_path }}/pdf"
+########################################################################
+#                                                                      #
+# pdf                                                                  #
+#                                                                      #
+########################################################################
 
 lago_pdf_container_image: "{{ lago_pdf_container_image_registry_prefix }}getlago/lago-gotenberg{{ lago_container_image_repository_name_suffix }}:{{ lago_pdf_container_image_tag }}"
-lago_pdf_container_image_registry_prefix: docker.io/
 lago_pdf_container_image_tag: 7
+lago_pdf_container_image_registry_prefix: docker.io/
 
 lago_pdf_container_network: "{{ lago_container_network }}"
 
@@ -344,6 +428,21 @@ lago_pdf_container_network: "{{ lago_container_network }}"
 lago_pdf_container_additional_networks: "{{ lago_pdf_container_additional_networks_auto + lago_pdf_container_additional_networks_custom }}"
 lago_pdf_container_additional_networks_auto: []
 lago_pdf_container_additional_networks_custom: []
+
+# A list of additional "volumes" to mount in the container.
+#
+# See the `--mount` documentation for the `docker run` command.
+#
+# Example:
+# lago_pdf_container_additional_volumes:
+#   - type: bind
+#     src: /path/on/the/host
+#     dst: /data
+#   - type: bind
+#     src: /another-path/on/the/host
+#     dst: /read-only
+#     options: readonly
+lago_pdf_container_additional_volumes: []
 
 # Specify how the container publishes its HTTP port
 #
@@ -397,26 +496,11 @@ lago_pdf_container_labels_additional_labels: "{{ lago_pdf_container_labels_addit
 lago_pdf_container_labels_additional_labels_auto: []
 lago_pdf_container_labels_additional_labels_custom: []
 
-# A list of additional "volumes" to mount in the container.
-#
-# See the `--mount` documentation for the `docker run` command.
-#
-# Example:
-# lago_pdf_container_additional_volumes:
-#   - type: bind
-#     src: /path/on/the/host
-#     dst: /data
-#   - type: bind
-#     src: /another-path/on/the/host
-#     dst: /read-only
-#     options: readonly
-lago_pdf_container_additional_volumes: []
+# Specify the size of the container's tmpfs volume
+lago_pdf_container_tmpfs_tmp_size: 512m
 
 # A list of extra arguments to pass to the container
 lago_pdf_container_extra_arguments: []
-
-# Additional environment variables.
-lago_pdf_environment_variables_additional_variables: ''
 
 # List of systemd services that the lago-pdf.service depends on
 lago_pdf_systemd_required_services_list: "{{ lago_pdf_systemd_required_systemd_services_list_default + lago_pdf_systemd_required_systemd_services_list_auto + lago_pdf_systemd_required_systemd_services_list_custom }}"
@@ -424,63 +508,11 @@ lago_pdf_systemd_required_systemd_services_list_default: "{{ [devture_systemd_do
 lago_pdf_systemd_required_systemd_services_list_auto: []
 lago_pdf_systemd_required_systemd_services_list_custom: []
 
-# Specifies the value of the `X-XSS-Protection` header
-# Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
-#
-# Learn more about it is here:
-# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
-# - https://portswigger.net/web-security/cross-site-scripting/reflected
-lago_http_header_xss_protection: "1; mode=block"
+# Additional environment variables.
+lago_pdf_environment_variables_additional_variables: ''
 
-# Specifies the value of the `X-Content-Type-Options` header.
-# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
-lago_http_header_content_type_options: nosniff
-
-# Specifies the value of the `Content-Security-Policy` header.
-# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
-lago_http_header_content_security_policy: frame-ancestors 'self'
-
-# Specifies the value of the `Permissions-Policy` header.
-# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
-lago_http_header_permissions_policy: "{{ 'interest-cohort=()' if lago_floc_optout_enabled else '' }}"
-
-# Specifies the value of the `Strict-Transport-Security` header.
-# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
-lago_http_header_strict_transport_security: "max-age=31536000; includeSubDomains{{ '; preload' if lago_hsts_preload_enabled else '' }}"
-
-# Controls whether to send a "Permissions-Policy interest-cohort=();" header along with all responses
-#
-# Learn more about what it is here:
-# - https://www.eff.org/deeplinks/2021/03/googles-floc-terrible-idea
-# - https://paramdeo.com/blog/opting-your-website-out-of-googles-floc-network
-# - https://amifloced.org/
-#
-# Of course, a better solution is to just stop using browsers (like Chrome), which participate in such tracking practices.
-# See: `lago_http_header_permissions_policy`
-lago_floc_optout_enabled: true
-
-# Controls if HSTS preloading is enabled
-#
-# In its strongest and recommended form, the [HSTS policy](https://www.chromium.org/hsts) includes all subdomains, and
-# indicates a willingness to be "preloaded" into browsers:
-# `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`
-# For more information visit:
-# - https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
-# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
-# - https://hstspreload.org/#opt-in
-# See: `lago_http_header_strict_transport_security`
-lago_hsts_preload_enabled: false
-
-lago_database_username: lago
-lago_database_password: ''
-lago_database_hostname: ''
-lago_database_port: 5432
-lago_database_name: lago
-
-lago_redis_hostname: ''
-lago_redis_port: 6379
-lago_redis_password: ''
-
-lago_redis_cache_hostname: "{{ lago_redis_hostname }}"
-lago_redis_cache_port: "{{ lago_redis_port }}"
-lago_redis_cache_password: "{{ lago_redis_password }}"
+########################################################################
+#                                                                      #
+# /pdf                                                                 #
+#                                                                      #
+########################################################################
