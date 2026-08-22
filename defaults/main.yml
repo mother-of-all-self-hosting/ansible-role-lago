@@ -28,12 +28,13 @@ lago_gotenberg_version: 7
 lago_uid: ""
 lago_gid: ""
 
+# The scheme used for serving Lago.
 lago_scheme: https
 
-# The hostname at which lago is served.
+# The hostname at which Lago is served.
 lago_hostname: ""
 
-# The path at which lago is served.
+# The path at which Lago is served.
 # This value must either be `/` or not end with a slash (e.g. `/lago`).
 lago_path_prefix: /
 
@@ -107,12 +108,14 @@ lago_floc_optout_enabled: true
 # See: `lago_http_header_strict_transport_security`
 lago_hsts_preload_enabled: false
 
-lago_database_username: lago
-lago_database_password: ""
+# Specify database configuration
 lago_database_hostname: ""
 lago_database_port: 5432
+lago_database_username: lago
+lago_database_password: ""
 lago_database_name: lago
 
+# Specify Redis configuration
 lago_redis_hostname: ""
 lago_redis_port: 6379
 lago_redis_password: ""
