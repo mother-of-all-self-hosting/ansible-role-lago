@@ -254,7 +254,7 @@ lago_api_environment_variable_lago_redis_cache_url: "redis://{{ lago_redis_cache
 lago_api_environment_variable_lago_redis_cache_password: "{{ lago_redis_cache_password }}"
 
 # Controls the LAGO_PDF_URL environment variable
-lago_api_environment_variable_lago_pdf_url: "http://{{ lago_identifier }}-pdf:{{ lago_pdf_container_http_port }}"
+lago_api_environment_variable_lago_pdf_url: "http://{{ lago_pdf_identifier }}:{{ lago_pdf_container_http_port }}"
 
 # Controls the SENTRY_DSN environment variable
 lago_api_environment_variable_sentry_dsn: ""
@@ -458,6 +458,8 @@ lago_front_environment_variables_additional_variables: ""
 # pdf                                                                  #
 #                                                                      #
 ########################################################################
+
+lago_pdf_identifier: "{{ lago_identifier }}-pdf"
 
 lago_pdf_container_image: "{{ lago_pdf_container_image_registry_prefix }}getlago/lago-gotenberg{{ lago_container_image_repository_name_suffix }}:{{ lago_pdf_container_image_tag }}"
 lago_pdf_container_image_tag: "{{ lago_gotenberg_version }}"

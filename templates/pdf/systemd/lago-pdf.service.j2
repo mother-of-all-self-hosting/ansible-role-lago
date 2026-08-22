@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
 [Unit]
-Description=Lago PDF ({{ lago_identifier }}-pdf)
+Description=Lago PDF ({{ lago_pdf_identifier }})
 {% for service in lago_pdf_systemd_required_services_list %}
 Requires={{ service }}
 After={{ service }}
@@ -15,12 +15,12 @@ DefaultDependencies=no
 [Service]
 Type=simple
 Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_identifier }}-pdf 2>/dev/null || true'
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_identifier }}-pdf 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_pdf_identifier }} 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_pdf_identifier }} 2>/dev/null || true'
 
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
-      --name={{ lago_identifier }}-pdf \
+      --name={{ lago_pdf_identifier }} \
       --log-driver=none \
       --user={{ lago_uid }}:{{ lago_gid }} \
       --cap-drop=ALL \
@@ -41,17 +41,17 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {{ lago_pdf_container_image }}
 
 {% for network in lago_pdf_container_additional_networks %}
-ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ lago_identifier }}-pdf
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ lago_pdf_identifier }}
 {% endfor %}
 
-ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ lago_identifier }}-pdf
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ lago_pdf_identifier }}
 
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_identifier }}-pdf 2>/dev/null || true'
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_identifier }}-pdf 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ lago_pdf_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ lago_pdf_identifier }} 2>/dev/null || true'
 
 Restart=always
 RestartSec=30
-SyslogIdentifier={{ lago_identifier }}-pdf
+SyslogIdentifier={{ lago_pdf_identifier }}
 
 [Install]
 WantedBy=multi-user.target
