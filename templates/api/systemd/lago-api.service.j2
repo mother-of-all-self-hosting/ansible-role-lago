@@ -26,8 +26,8 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --cap-drop=ALL \
       --read-only \
       --network={{ lago_api_container_network }} \
-      {% if lago_api_container_http_bind_port %}
-      -p {{ lago_api_container_http_bind_port }}:3000 \
+      {% if lago_api_container_http_host_bind_port %}
+      -p {{ lago_api_container_http_host_bind_port }}:3000 \
       {% endif %}
       --env-file={{ lago_api_base_path }}/env \
       --label-file={{ lago_api_base_path }}/labels \

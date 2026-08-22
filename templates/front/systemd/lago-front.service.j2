@@ -28,8 +28,8 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --name={{ lago_identifier }}-front \
       --log-driver=none \
       --network={{ lago_front_container_network }} \
-      {% if lago_front_container_http_bind_port %}
-      -p {{ lago_front_container_http_bind_port }}:80 \
+      {% if lago_front_container_http_host_bind_port %}
+      -p {{ lago_front_container_http_host_bind_port }}:80 \
       {% endif %}
       --env-file={{ lago_front_base_path }}/env \
       --label-file={{ lago_front_base_path }}/labels \
