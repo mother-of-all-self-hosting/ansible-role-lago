@@ -55,4 +55,6 @@ traefik.http.routers.{{ lago_identifier }}-pdf.tls.certResolver={{ lago_pdf_cont
 traefik.http.services.{{ lago_identifier }}-pdf.loadbalancer.server.port=3000
 {% endif %}
 
-{{ lago_pdf_container_labels_additional_labels }}
+{% for arg in lago_pdf_container_labels_additional_labels %}
+{{ arg }}
+{% endfor %}

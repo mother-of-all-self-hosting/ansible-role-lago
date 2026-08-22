@@ -55,4 +55,6 @@ traefik.http.routers.{{ lago_identifier }}-api.tls.certResolver={{ lago_api_cont
 traefik.http.services.{{ lago_identifier }}-api.loadbalancer.server.port=3000
 {% endif %}
 
-{{ lago_api_container_labels_additional_labels }}
+{% for arg in lago_api_container_labels_additional_labels %}
+{{ arg }}
+{% endfor %}
