@@ -1,0 +1,137 @@
+# SPDX-FileCopyrightText: 2026 Suguru Hirahara
+# SPDX-FileCopyrightText: 2026 spatterlight
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+- name: Verify Lago systemd service
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Wait for Lago PDF service to become active (up to 180s)
+      ansible.builtin.systemd:
+        name: lago-pdf.service
+      register: lago_pdf_service
+      until: lago_pdf_service.status.ActiveState == 'active'
+      retries: 36
+      delay: 5
+
+    - name: Assert Lago PDF service is active
+      ansible.builtin.assert:
+        that: lago_pdf_service.status.ActiveState == 'active'
+        fail_msg: "lago-pdf.service not active ({{ lago_pdf_service.status.ActiveState }})"
+        success_msg: "lago-pdf.service is active"
+
+    - name: Retrieve Lago PDF service log for debugging
+      when: lago_debug_service_enabled | bool
+      ansible.builtin.command:
+        cmd: journalctl -xeu lago-pdf.service
+      changed_when: false
+
+    - name: Wait for Lago API service to become active (up to 180s)
+      ansible.builtin.systemd:
+        name: lago-api.service
+      register: lago_api_service
+      until: lago_api_service.status.ActiveState == 'active'
+      retries: 36
+      delay: 5
+
+    - name: Assert Lago API service is active
+      ansible.builtin.assert:
+        that: lago_api_service.status.ActiveState == 'active'
+        fail_msg: "lago-api.service not active ({{ lago_api_service.status.ActiveState }})"
+        success_msg: "lago-api.service is active"
+
+    - name: Retrieve Lago API service log for debugging
+      when: lago_debug_service_enabled | bool
+      ansible.builtin.command:
+        cmd: journalctl -xeu lago-api.service
+      changed_when: false
+
+    - name: Wait for Lago front service to become active (up to 180s)
+      ansible.builtin.systemd:
+        name: lago-front.service
+      register: lago_front_service
+      until: lago_front_service.status.ActiveState == 'active'
+      retries: 36
+      delay: 5
+
+    - name: Assert Lago front service is active
+      ansible.builtin.assert:
+        that: lago_front_service.status.ActiveState == 'active'
+        fail_msg: "lago-front.service not active ({{ lago_front_service.status.ActiveState }})"
+        success_msg: "lago-front.service is active"
+
+    - name: Retrieve Lago front service log for debugging
+      when: lago_debug_service_enabled | bool
+      ansible.builtin.command:
+        cmd: journalctl -xeu lago-front.service
+      changed_when: false
+
+    - name: Wait for Lago API clock service to become active (up to 180s)
+      ansible.builtin.systemd:
+        name: lago-api-clock.service
+      register: lago_api_clock_service
+      until: lago_api_clock_service.status.ActiveState == 'active'
+      retries: 36
+      delay: 5
+
+    - name: Assert Lago API clock service is active
+      ansible.builtin.assert:
+        that: lago_api_clock_service.status.ActiveState == 'active'
+        fail_msg: "lago-api-clock.service not active ({{ lago_api_clock_service.status.ActiveState }})"
+        success_msg: "lago-api-clock.service is active"
+
+    - name: Retrieve Lago API clock service log for debugging
+      when: lago_debug_service_enabled | bool
+      ansible.builtin.command:
+        cmd: journalctl -xeu lago-api-clock.service
+      changed_when: false
+
+    - name: Wait for Lago API worker service to become active (up to 180s)
+      ansible.builtin.systemd:
+        name: lago-api-worker.service
+      register: lago_api_worker_service
+      until: lago_api_worker_service.status.ActiveState == 'active'
+      retries: 36
+      delay: 5
+
+    - name: Assert Lago API worker service is active
+      ansible.builtin.assert:
+        that: lago_api_worker_service.status.ActiveState == 'active'
+        fail_msg: "lago-api-worker.service not active ({{ lago_api_worker_service.status.ActiveState }})"
+        success_msg: "lago-api-worker.service is active"
+
+    - name: Retrieve Lago API worker service log for debugging
+      when: lago_debug_service_enabled | bool
+      ansible.builtin.command:
+        cmd: journalctl -xeu lago-api-worker.service
+      changed_when: false
+
+    - name: Wait for Lago HTTP endpoint to respond (up to 10m)
+      ansible.builtin.uri:
+        url: "http://localhost:80/"
+        method: GET
+        status_code: [200, 301, 302]
+        follow_redirects: none
+      register: lago_endpoint
+      until: lago_endpoint.status in [200, 301, 302]
+      retries: 60
+      delay: 5
+
+    - name: Assert Lago HTTP endpoint responds
+      ansible.builtin.assert:
+        that: lago_endpoint.status in [200, 301, 302]
+        fail_msg: "Lago did not respond as expected ({{ lago_endpoint.status | default('no response') }})"
+        success_msg: "Lago responded with {{ lago_endpoint.status }}"
+
+    - name: Show Lago systemd service status summary
+      ansible.builtin.debug:
+        msg:
+          - "Lago API systemd: {{ lago_api_service.status.ActiveState }}"
+          - "Lago API clock systemd: {{ lago_api_clock_service.status.ActiveState }}"
+          - "Lago API worker systemd: {{ lago_api_worker_service.status.ActiveState }}"
+          - "Lago front systemd: {{ lago_front_service.status.ActiveState }}"
+          - "Lago PDF systemd: {{ lago_pdf_service.status.ActiveState }}"
+          - "Lago HTTP: {{ lago_endpoint.status }}"

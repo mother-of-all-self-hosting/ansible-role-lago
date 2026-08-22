@@ -32,7 +32,7 @@
       "groupName": "GitHub Actions dependencies"
     },
     {
-      "matchManagers": ["mise", "pre-commit"],
+      "matchManagers": ["mise", "pip_requirements", "pre-commit", "pyenv"],
       "schedule": ["* * 1-7 */6 *"],
       "automergeSchedule": ["* * 1-14 */6 *"]
     }
