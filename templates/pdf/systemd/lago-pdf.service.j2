@@ -27,7 +27,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --read-only \
       --network={{ lago_pdf_container_network }} \
       {% if lago_pdf_container_http_host_bind_port %}
-      -p {{ lago_pdf_container_http_host_bind_port }}:3000 \
+      -p {{ lago_pdf_container_http_host_bind_port }}:{{ lago_pdf_container_http_port }} \
       {% endif %}
       --env-file={{ lago_pdf_base_path }}/env \
       --label-file={{ lago_pdf_base_path }}/labels \
