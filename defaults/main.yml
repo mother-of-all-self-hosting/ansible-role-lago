@@ -40,6 +40,9 @@ lago_container_image_repository_name_suffix: |-
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 lago_container_network: "{{ lago_identifier }}"
 
+# Control if the container network is deleted on uninstalling.
+lago_container_network_deletion_enabled: true
+
 lago_container_labels_traefik_enabled: true
 lago_container_labels_traefik_docker_network: "{{ lago_container_network }}"
 lago_container_labels_traefik_hostname: "{{ lago_hostname }}"

@@ -1,8 +1,28 @@
 # SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
+- name: Ensure Lago container network does not exist
+  when: lago_container_network_deletion_enabled
+  block:
+    - name: Ensure Lago container network does not exist via community.docker.docker_network
+      when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
+      community.docker.docker_network:
+        name: "{{ lago_container_network }}"
+        state: absent
+      register: lago_network_deletion_result
+
+    - name: Ensure Lago container network does not exist via ansible.builtin.command
+      when: devture_systemd_docker_base_container_network_creation_method == 'command'
+      ansible.builtin.command:
+        cmd: >-
+          {{ devture_systemd_docker_base_host_command_docker }} network rm
+          {{ lago_container_network }}
+      register: lago_network_deletion_result
+      changed_when: lago_container_network in lago_network_deletion_result.stdout
+
 - name: Ensure Lago path does not exist
   ansible.builtin.file:
     path: "{{ lago_base_path }}"
