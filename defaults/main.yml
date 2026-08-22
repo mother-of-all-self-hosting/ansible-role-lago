@@ -23,7 +23,7 @@ lago_pdf_base_path: "{{ lago_base_path }}/pdf"
 lago_version: v1.6.4
 
 # renovate: datasource=docker depName=getlago/lago-gotenberg
-lago_gotenberg_version: 7
+lago_gotenberg_version: 8
 
 lago_uid: ""
 lago_gid: ""
