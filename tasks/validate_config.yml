@@ -14,6 +14,15 @@
     - { "old": "lago_front_container_http_bind_port", "new": "lago_front_container_http_host_bind_port" }
     - { "old": "lago_pdf_container_http_bind_port", "new": "lago_pdf_container_http_host_bind_port" }
     - { "old": "lago_http_header_content_permission_policy", "new": "lago_http_header_permissions_policy" }
+    - { "old": "lago_api_systemd_required_systemd_services_list_default", "new": "lago_api_systemd_required_services_list_default" }
+    - { "old": "lago_api_systemd_required_systemd_services_list_auto", "new": "lago_api_systemd_required_services_list_auto" }
+    - { "old": "lago_api_systemd_required_systemd_services_list_custom", "new": "lago_api_systemd_required_services_list_custom" }
+    - { "old": "lago_front_systemd_required_systemd_services_list_default", "new": "lago_front_systemd_required_services_list_default" }
+    - { "old": "lago_front_systemd_required_systemd_services_list_auto", "new": "lago_front_systemd_required_services_list_auto" }
+    - { "old": "lago_front_systemd_required_systemd_services_list_custom", "new": "lago_front_systemd_required_services_list_custom" }
+    - { "old": "lago_pdf_systemd_required_systemd_services_list_default", "new": "lago_pdf_systemd_required_services_list_default" }
+    - { "old": "lago_pdf_systemd_required_systemd_services_list_auto", "new": "lago_pdf_systemd_required_services_list_auto" }
+    - { "old": "lago_pdf_systemd_required_systemd_services_list_custom", "new": "lago_pdf_systemd_required_services_list_custom" }
     - { "old": "lago_api_container_image_force_pull", "new": "<removed> (the new community.docker.docker_image_pull module handles this natively)" }
     - { "old": "lago_front_container_image_force_pull", "new": "<removed> (the new community.docker.docker_image_pull module handles this natively)" }
     - { "old": "lago_pdf_container_image_force_pull", "new": "<removed> (the new community.docker.docker_image_pull module handles this natively)" }
