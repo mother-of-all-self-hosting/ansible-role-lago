@@ -30,20 +30,20 @@
   community.docker.docker_image_pull:
     name: "{{ lago_api_container_image }}"
     pull: always
-  register: result
+  register: lago_api_container_image_pull_result_ansible_module
   retries: "{{ devture_playbook_help_container_retries_count }}"
   delay: "{{ devture_playbook_help_container_retries_delay }}"
-  until: result is not failed
+  until: lago_api_container_image_pull_result_ansible_module is not failed
 
 - name: Ensure Lago API container image is pulled via ansible.builtin.command
   when: devture_systemd_docker_base_container_image_pull_method == 'command'
   ansible.builtin.command:
     cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ lago_api_container_image }}"
-  register: result
+  register: lago_api_container_image_pull_result_command
   retries: "{{ devture_playbook_help_container_retries_count }}"
   delay: "{{ devture_playbook_help_container_retries_delay }}"
-  until: result is not failed
-  changed_when: "'Downloaded newer image' in result.stdout"
+  until: lago_api_container_image_pull_result_command is not failed
+  changed_when: "'Downloaded newer image' in lago_api_container_image_pull_result_command.stdout"
 
 - name: Ensure Lago API container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
