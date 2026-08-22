@@ -203,8 +203,10 @@ lago_api_container_labels_additional_labels: "{{ lago_api_container_labels_addit
 lago_api_container_labels_additional_labels_auto: []
 lago_api_container_labels_additional_labels_custom: []
 
-# A list of extra arguments to pass to the container
-lago_api_container_extra_arguments: []
+# A list of extra arguments to pass to the container (`docker create` command)
+lago_api_container_extra_arguments: "{{ lago_api_container_extra_arguments_auto + lago_api_container_extra_arguments_custom }}"
+lago_api_container_extra_arguments_auto: []
+lago_api_container_extra_arguments_custom: []
 
 # List of systemd services that the lago-api.service depends on
 lago_api_systemd_required_services_list: "{{ lago_api_systemd_required_systemd_services_list_default + lago_api_systemd_required_systemd_services_list_auto + lago_api_systemd_required_systemd_services_list_custom }}"
@@ -362,8 +364,10 @@ lago_front_container_labels_additional_labels: "{{ lago_front_container_labels_a
 lago_front_container_labels_additional_labels_auto: []
 lago_front_container_labels_additional_labels_custom: []
 
-# A list of extra arguments to pass to the container
-lago_front_container_extra_arguments: []
+# A list of extra arguments to pass to the container (`docker create` command)
+lago_front_container_extra_arguments: "{{ lago_front_container_extra_arguments_auto + lago_front_container_extra_arguments_custom }}"
+lago_front_container_extra_arguments_auto: []
+lago_front_container_extra_arguments_custom: []
 
 # List of systemd services that the lago-front.service depends on
 lago_front_systemd_required_services_list: "{{ lago_front_systemd_required_systemd_services_list_default + lago_front_systemd_required_systemd_services_list_auto + lago_front_systemd_required_systemd_services_list_custom }}"
@@ -485,8 +489,10 @@ lago_pdf_container_labels_additional_labels_custom: []
 # Specify the size of the container's tmpfs volume
 lago_pdf_container_tmpfs_tmp_size: 512m
 
-# A list of extra arguments to pass to the container
-lago_pdf_container_extra_arguments: []
+# A list of extra arguments to pass to the container (`docker create` command)
+lago_pdf_container_extra_arguments: "{{ lago_pdf_container_extra_arguments_auto + lago_pdf_container_extra_arguments_custom }}"
+lago_pdf_container_extra_arguments_auto: []
+lago_pdf_container_extra_arguments_custom: []
 
 # List of systemd services that the lago-pdf.service depends on
 lago_pdf_systemd_required_services_list: "{{ lago_pdf_systemd_required_systemd_services_list_default + lago_pdf_systemd_required_systemd_services_list_auto + lago_pdf_systemd_required_systemd_services_list_custom }}"
