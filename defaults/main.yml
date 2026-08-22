@@ -25,19 +25,19 @@ lago_version: v0.50.0-beta
 # renovate: datasource=docker depName=getlago/lago-gotenberg
 lago_gotenberg_version: 7
 
-lago_uid: ''
-lago_gid: ''
+lago_uid: ""
+lago_gid: ""
 
 lago_scheme: https
 
 # The hostname at which lago is served.
-lago_hostname: ''
+lago_hostname: ""
 
 # The path at which lago is served.
 # This value must either be `/` or not end with a slash (e.g. `/lago`).
 lago_path_prefix: /
 
-lago_architecture: ''
+lago_architecture: ""
 
 lago_container_image_repository_name_suffix: |-
   {{
@@ -108,14 +108,14 @@ lago_floc_optout_enabled: true
 lago_hsts_preload_enabled: false
 
 lago_database_username: lago
-lago_database_password: ''
-lago_database_hostname: ''
+lago_database_password: ""
+lago_database_hostname: ""
 lago_database_port: 5432
 lago_database_name: lago
 
-lago_redis_hostname: ''
+lago_redis_hostname: ""
 lago_redis_port: 6379
-lago_redis_password: ''
+lago_redis_password: ""
 
 lago_redis_cache_hostname: "{{ lago_redis_hostname }}"
 lago_redis_cache_port: "{{ lago_redis_port }}"
@@ -222,7 +222,7 @@ lago_api_systemd_required_services_list_custom: []
 
 # Controls the LAGO_RSA_PRIVATE_KEY environment variable
 # This is to be generated with: `openssl genrsa 2048 | base64 --wrap=0`
-lago_api_environment_variable_lago_rsa_private_key: ''
+lago_api_environment_variable_lago_rsa_private_key: ""
 
 # Controls the LAGO_API_URL environment variable
 lago_api_environment_variable_lago_api_url: "{{ lago_scheme }}://{{ lago_hostname }}{{ lago_api_path_prefix }}"
@@ -249,28 +249,28 @@ lago_api_environment_variable_lago_redis_cache_password: "{{ lago_redis_cache_pa
 lago_api_environment_variable_lago_pdf_url: "http://{{ lago_identifier }}-pdf:{{ lago_pdf_container_http_port }}"
 
 # Controls the SENTRY_DSN environment variable
-lago_api_environment_variable_sentry_dsn: ''
+lago_api_environment_variable_sentry_dsn: ""
 
 # Controls the LAGO_SIDEKIQ_WEB environment variable
-lago_api_environment_variable_lago_sidekiq_web: ''
+lago_api_environment_variable_lago_sidekiq_web: ""
 
 # Controls the LAGO_OAUTH_PROXY_URL environment variable
 lago_api_environment_variable_lago_oauth_proxy_url: https://proxy.getlago.com
 
 # Controls the LAGO_LICENSE environment variable
-lago_api_environment_variable_lago_license: ''
+lago_api_environment_variable_lago_license: ""
 
 # Controls the SECRET_KEY_BASE environment variable
-lago_api_environment_variable_secret_key_base: ''
+lago_api_environment_variable_secret_key_base: ""
 
 # Controls the ENCRYPTION_PRIMARY_KEY environment variable
-lago_api_environment_variable_encryption_primary_key: ''
+lago_api_environment_variable_encryption_primary_key: ""
 
 # Controls the ENCRYPTION_DETERMINISTIC_KEY environment variable
-lago_api_environment_variable_encryption_deterministic_key: ''
+lago_api_environment_variable_encryption_deterministic_key: ""
 
 # Controls the ENCRYPTION_KEY_DERIVATION_SALT environment variable
-lago_api_environment_variable_encryption_key_derivation_salt: ''
+lago_api_environment_variable_encryption_key_derivation_salt: ""
 
 # Controls the RAILS_ENV environment variable
 lago_api_environment_variable_rails_env: production
@@ -282,7 +282,7 @@ lago_api_environment_variable_rails_log_to_stdout: true
 lago_api_environment_variable_new_relic_agent_enabled: false
 
 # Additional environment variables.
-lago_api_environment_variables_additional_variables: ''
+lago_api_environment_variables_additional_variables: ""
 
 ########################################################################
 #                                                                      #
@@ -386,7 +386,7 @@ lago_front_systemd_required_services_list_custom: []
 
 # Controls the LAGO_RSA_PRIVATE_KEY environment variable
 # This is to be generated with: `openssl genrsa 2048 | base64 --wrap=0`
-lago_front_environment_variable_lago_rsa_private_key: ''
+lago_front_environment_variable_lago_rsa_private_key: ""
 
 # Controls the API_URL environment variable
 lago_front_environment_variable_api_url: "{{ lago_api_environment_variable_lago_api_url }}"
@@ -395,7 +395,7 @@ lago_front_environment_variable_api_url: "{{ lago_api_environment_variable_lago_
 lago_front_environment_variable_app_env: production
 
 # Controls the SENTRY_DSN environment variable
-lago_front_environment_variable_sentry_dsn: ''
+lago_front_environment_variable_sentry_dsn: ""
 
 # Controls the CODEGEN_API environment variable
 lago_front_environment_variable_codegen_api: "{{ lago_front_environment_variable_api_url }}"
@@ -407,7 +407,7 @@ lago_front_environment_variable_lago_disable_signup: true
 lago_front_environment_variable_lago_oauth_proxy_url: "{{ lago_api_environment_variable_lago_oauth_proxy_url }}"
 
 # Additional environment variables.
-lago_front_environment_variables_additional_variables: ''
+lago_front_environment_variables_additional_variables: ""
 
 ########################################################################
 #                                                                      #
@@ -513,7 +513,7 @@ lago_pdf_systemd_required_services_list_auto: []
 lago_pdf_systemd_required_services_list_custom: []
 
 # Additional environment variables.
-lago_pdf_environment_variables_additional_variables: ''
+lago_pdf_environment_variables_additional_variables: ""
 
 ########################################################################
 #                                                                      #
