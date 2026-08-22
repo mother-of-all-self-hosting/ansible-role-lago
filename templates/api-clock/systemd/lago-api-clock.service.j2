@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
 [Unit]
-Description=Lago API Clock ({{ lago_identifier }}-api-clock)
+Description=Lago API Clock ({{ lago_api_clock_identifier }})
 Requires={{ lago_api_identifier }}.service
 After={{ lago_api_identifier }}.service
 DefaultDependencies=no
@@ -15,7 +15,7 @@ Type=simple
 ExecStart={{ devture_systemd_docker_base_host_command_docker }} exec {{ lago_api_identifier }} ./scripts/start.clock.sh
 Restart=always
 RestartSec=30
-SyslogIdentifier={{ lago_identifier }}-api-clock
+SyslogIdentifier={{ lago_api_clock_identifier }}
 
 [Install]
 WantedBy=multi-user.target

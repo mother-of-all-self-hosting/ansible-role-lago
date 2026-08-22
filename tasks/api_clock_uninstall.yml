@@ -5,7 +5,7 @@
 ---
 - name: Check existence of Lago API Clock systemd service
   ansible.builtin.stat:
-    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api-clock.service"
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_api_clock_identifier }}.service"
   register: lago_api_clock_service_stat
 
 - name: Uninstall Lago API Clock systemd services and files
@@ -13,12 +13,12 @@
   block:
     - name: Ensure Lago API Clock systemd service is stopped
       ansible.builtin.service:
-        name: "{{ lago_identifier }}-api-clock"
+        name: "{{ lago_api_clock_identifier }}"
         state: stopped
         enabled: false
         daemon_reload: true
 
     - name: Ensure Lago API Clock systemd service does not exist
       ansible.builtin.file:
-        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_identifier }}-api-clock.service"
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ lago_api_clock_identifier }}.service"
         state: absent
