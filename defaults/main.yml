@@ -20,7 +20,7 @@ lago_front_base_path: "{{ lago_base_path }}/front"
 lago_pdf_base_path: "{{ lago_base_path }}/pdf"
 
 # renovate: datasource=docker depName=getlago/api versioning=semver
-lago_version: v1.50.0
+lago_version: v1.51.0
 
 # renovate: datasource=docker depName=getlago/lago-gotenberg
 lago_gotenberg_version: 8.15
