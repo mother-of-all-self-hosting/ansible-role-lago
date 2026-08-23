@@ -21,6 +21,9 @@ Type=simple
 Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
 ExecStartPre={{ devture_systemd_docker_base_host_command_sh }} -c '{{ lago_api_container_cleanup_command | trim | replace("\n", " ") }}'
 
+{#
+  tmpfs at /tmp is necessary for /tmp/prometheus on Debian 13.
+#}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
       --name={{ lago_api_identifier }} \
@@ -42,6 +45,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --tmpfs=/app/tmp/pids:rw,noexec,nosuid,size=128m \
       --tmpfs=/app/tmp/sockets:rw,noexec,nosuid,size=128m \
       --tmpfs=/app/log:rw,noexec,nosuid,size=128m \
+      --tmpfs=/tmp:rw,noexec,nosuid,size=128m \
       {% for arg in lago_api_container_extra_arguments %}
       {{ arg }} \
       {% endfor %}
