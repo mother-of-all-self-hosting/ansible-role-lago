@@ -46,13 +46,19 @@ lago_path_prefix: /
 
 lago_architecture: ""
 
-lago_container_image_repository_name_suffix: |-
-  {{
-    {
-      'amd64': '',
-      'arm64': '-arm64v8',
-    }[lago_architecture]
-  }}
+# A suffix appended to the Lago image repository names (see `lago_api_container_image` and friends).
+#
+# This used to resolve to `-arm64v8` on arm64, but `docker.io/getlago/api-arm64v8`,
+# `docker.io/getlago/front-arm64v8` and `docker.io/getlago/lago-gotenberg-arm64v8`
+# do not exist at all, so the role could not pull an image on arm64 hosts.
+#
+# All three upstream images are multi-architecture OCI indexes which already
+# carry both linux/amd64 and linux/arm64, so the plain repository name is the
+# correct one on every supported architecture.
+#
+# The variable is kept (rather than removed) so that installations overriding it
+# keep working.
+lago_container_image_repository_name_suffix: ""
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 lago_container_network: "{{ lago_identifier }}"
