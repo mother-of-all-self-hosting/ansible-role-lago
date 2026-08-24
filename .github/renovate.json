@@ -1,5 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Patch releases are deliberately not automerged here, unlike in most other roles in this fleet, for two independent reasons.",
+    "First: the getlago/api container migrates the database itself. Its default command is ./scripts/start.sh, which runs `rails db:migrate` on every start, forward-only, before it serves anything. An automerged patch would therefore rewrite the schema of the database holding the users' invoices, subscriptions and payments, unattended and with no way back short of restoring a backup.",
+    "Second: lago_version tags both getlago/api and getlago/front, and upstream does not always publish the two together. v1.41.1, v1.41.2, v1.41.3, v1.47.1 and v1.47.2 all exist as getlago/api images with no matching getlago/front image, so automerging such a bump would leave the role unable to pull a front image at all.",
+    "Both failure modes are caught by the Molecule run on the pull request, which is exactly the checkpoint that automerging would remove."
+  ],
   "extends": [
     "github>mother-of-all-self-hosting/renovate-config#v1.0.0"
   ]

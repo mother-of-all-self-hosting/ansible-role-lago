@@ -418,6 +418,13 @@ lago_api_worker_systemd_wanted_services_list_custom: []
 lago_front_identifier: "{{ lago_identifier }}-front"
 
 lago_front_container_image: "{{ lago_front_container_image_registry_prefix }}getlago/front{{ lago_container_image_repository_name_suffix }}:{{ lago_front_container_image_tag }}"
+# The frontend follows the same version as the API by default, which is what
+# upstream does for its own minor releases.
+#
+# Beware that upstream does not publish the two images for every patch release:
+# v1.41.1, v1.41.2, v1.41.3, v1.47.1 and v1.47.2 exist as `getlago/api` images
+# with no `getlago/front` counterpart. Pinning `lago_version` to such a release
+# requires pinning this variable to the last frontend version that does exist.
 lago_front_container_image_tag: "{{ lago_version }}"
 lago_front_container_image_registry_prefix: docker.io/
 
