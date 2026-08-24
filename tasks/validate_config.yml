@@ -26,6 +26,7 @@
     - { "old": "lago_api_container_image_force_pull", "new": "<removed> (the new community.docker.docker_image_pull module handles this natively)" }
     - { "old": "lago_front_container_image_force_pull", "new": "<removed> (the new community.docker.docker_image_pull module handles this natively)" }
     - { "old": "lago_pdf_container_image_force_pull", "new": "<removed> (the new community.docker.docker_image_pull module handles this natively)" }
+    - { "old": "lago_front_environment_variable_lago_rsa_private_key", "new": "<removed> (it never reached the frontend container; the API is what needs the key, via `lago_api_environment_variable_lago_rsa_private_key`)" }
 
 - name: Fail if required Lago settings not defined
   ansible.builtin.fail:

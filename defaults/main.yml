@@ -554,10 +554,6 @@ lago_front_container_cleanup_command: |
   echo "Failed to remove stale container {{ lago_front_identifier }} after {{ lago_front_container_cleanup_timeout_seconds }} attempts" >&2;
   exit 1
 
-# Controls the LAGO_RSA_PRIVATE_KEY environment variable
-# This is to be generated with: `openssl genrsa 2048 | base64 --wrap=0`
-lago_front_environment_variable_lago_rsa_private_key: ""
-
 # Controls the API_URL environment variable
 lago_front_environment_variable_api_url: "{{ lago_api_environment_variable_lago_api_url }}"
 
