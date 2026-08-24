@@ -31,6 +31,12 @@ provisioner:
         # Helper variables
         lago_debug_service_enabled: false
 
+        # The container names the role derives from the identifiers below.
+        # Role defaults are not in scope in a verify play, so they are spelled out.
+        lago_molecule_api_container: lago-api
+        lago_molecule_front_container: lago-front
+        lago_molecule_pdf_container: lago-pdf
+
         # Variables for Lago
         lago_uid: 1000
         lago_gid: 1000
@@ -39,7 +45,23 @@ provisioner:
         lago_container_labels_traefik_enabled: false
         lago_api_container_http_host_bind_port: 3000
         lago_front_container_http_host_bind_port: 80
+        lago_pdf_container_http_host_bind_port: 3001
         lago_architecture: amd64
+
+        # Sidekiq, which `lago-api-worker.service` runs inside the API container,
+        # opens a liveness server on port 8080 of that container. Publishing it is
+        # what lets the verification tell a worker that is genuinely running and
+        # talking to Valkey apart from a systemd unit that merely reads `active`.
+        lago_api_container_extra_arguments_custom:
+          - "-p 127.0.0.1:8080:8080"
+
+        # Mounts Sidekiq's web interface at /sidekiq in the API. The verification
+        # asks for that route to prove that this leaf variable travels all the way
+        # into the running Rails process' route table.
+        # It must stay a quoted string: Lago compares the environment variable
+        # against the literal "true", and an unquoted YAML boolean would reach the
+        # container as "True".
+        lago_api_environment_variable_lago_sidekiq_web: "true"
         lago_api_environment_variable_lago_rsa_private_key: "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2UUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktjd2dnU2pBZ0VBQW9JQkFRRFRVeUVkeU5lWFNNQksKRlZ5OUlPVm5Idi83UVNxb1pDRjdzMmFSSG40WkVtRVIyak1FeXJYNFM3Z0szejdITDQrSTV0U1VhcGpUZnNZMwpCK3FjT2JtRkJ0cGlQZ0VEYkpmeTZCd1dIV3BMMkpHMkhubS9lcGNweUhTWW1Vc0E3NnlzWVVWY0hVWDRxSW9rCnFYZnN1Q2F2U09nakJhNWhFUi83SEVlMncyZUhadjJUZ1d4ZHY5TTluOVBFZEMwVzQ1aDVxc2puSy90dzA0TE8KZ1FEUCtlbk5idTdESTRsSjQ2UVpSZCtpUVQ1WmsrNWdpM1U3c0pBUURMeTV4b20zU1hta09CWWZWcWxNSm5YVQppeWVLWHRmVFpZNUZ0c2E2MmY4TlJPTTJKWkVoUGZSUXpFTDAraitaUDRMS1dNWnVjbFQ0Q2lNbnJPTForbUdQCjVhN0hhdnZYQWdNQkFBRUNnZ0VBQWhOMzAxR1U5ZlVEMSt2T3plMkQrTUtLdEQ2eDBHd0V2TnVJZjBET21mNGUKdXdJQVFmbjExZ1hKdmVoRWpITmwveFo1Y2RNbTdqT2tJZDFFNE8rdzZBMThXV2tQaHllVmRKQklMN0FaU21aMQp4QUFYcFJuQXRoWGZPTEtQZnowR05CUCtqa2J4V0RNeEFaR0grVDR6NUd2eHhUVDU2aFUwMGJtTTVpUSs5a3NOCnA3UjNxTmFtUWROV213ZG5YYjJHMXRheTg5ZmJMYlQ4YTYzazVVZVBUWWxXeTNiVUFnV1RTTkhlUklzcFpwWXMKY09KOFF2cUJyR3JZb24rdktVU0o2Y1lsZDA1TkZ0bzM1VGxCR1VVR3RpQjhBM0FMbURtVFVRcWJ0YURWSHZOVApNNzlqWXJhUjhnMkUyTjhmcnpWV3FHSUlnZUE2UWU5SjVvTDFZd254NVFLQmdRRHF6dTgzWGsyTUEzN3RCSVo3Ck04OUw1WkNKRTNNbmt2YmQzS3hRV2NGczFpTWlBYmVXZGZWdzRnNFByRUJJaG1xb0xWV0J0NG4xc3ozdzVPY28KVDhqb3p3N0o5VmZaNkZodjFlMFdHaE1yQmRKWFR1NnViUC9BZVBGWTgzbjZpRW1iaFdMQ1VtZXZNbVBmVENoTwpBVXJLRDg3ODB4azRxV1kwNldJam9NN0pTd0tCZ1FEbVpaL0hxZWJmL1I5V21YMERBcG1hS3VyUkk4a2ZEc1VSClhNd3RUNnRkK3RGM2VuYlQ4SWFobUxUVUdzKytkUWRWU1U3UGV0VXB6TzJvUFhPeDMvZWxsVkhrUmFmNDRVTjgKeGVXMXh6RWJ2blEyQUR3ZTB0ckNGQTdaNDQ1Mml2NDZCRHhSMytPL1o0am9Vdzh1UldJdHBOTTNWT0dMZ2pScAo5bzYzbm0wc0pRS0JnRE1wcytZVW5rRUw0ZlF6TURwWUo2c1o4a3hyK0lOKytsdU5ZZDZBTUMxTzI0amxadU5hCkFJa0FPS0Fob0VBdFNjQXJZSjVMSjd4cHVlMXJjeExOajdGcXJJWkU5MGQ3NFFrOVM5T3RDdEF0REpBSm11aFcKeDhOZ2x2WVMxMWxIcVFKQ0ppckJXZVpLeklnelIvVDNReHlVSlQzaG9YVS9OQTREYkdibSt5ZlJBb0dCQUlEMgpxWFZOdVJudnliYmp1NElQMW9MaE93ZE9ES29Cem5WbGlEUmt2L3VmQmRqbkI5U2ljZm5LVEkzZFpDT3J4aXNMCkdiNHhkMWdxaVd6KzJOL2NDZmI1bWhrNGxFbFBia05OVXNOcGVDZWJkOWt5VUhUQWVncmd4MTlYYk1zV0NpL1gKWnh3OVFuSkZOZkUxYk8zdGtJTVVHOWFCQUs3aWR3eEpJcUhOWURheEFvR0FGZkttR3hFcjN3VzNmdlVxQmlpeApHd3g3RWF0blRIYy9mQ3A0eWhJN1l4ZnFmYmtIVmlCQ1FNQVY3VGZmNms3RU9TVTE4K3NRY0Nhcmx2YTVYaE02Cml4eW1tV0dZb2hhSlNUVmJMMFU1aVBkaDZzN1VxdDZ0Tm53V1hBNnNaSHJaeDB5QnViOUs1aFRrTkFsQi8wYkgKWkRLU1hPUEZjdUg4dWE1YlIyWmpjM0k9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K"
         lago_api_environment_variable_lago_api_url: http://localhost:3000
         lago_api_environment_variable_lago_front_url: http://localhost:80
@@ -54,16 +76,18 @@ provisioner:
         lago_database_username: my_database_username
         lago_database_password: my_database_password
         lago_database_name: lago
-        lago_systemd_required_services_list_auto: |
-          {{
-            (['postgres.service'])
-          }}
 
         # Variables required for Lago to connect to the Valkey data-store
         lago_redis_hostname: "{{ valkey_identifier }}"
         lago_api_container_additional_networks_custom:
           - "{{ valkey_container_network }}"
+
+        # `lago_systemd_required_services_list_auto` used to be listed here to
+        # order the API after Postgres. No such variable exists - the role's are
+        # per component (`lago_api_systemd_required_services_list_*`) - so it was
+        # read by nobody and the API was ordered after Valkey only.
         lago_api_systemd_required_services_list_custom:
+          - postgres.service
           - "{{ valkey_identifier }}.service"
 
         # Variables for Postgres
@@ -71,6 +95,21 @@ provisioner:
         postgres_gid: 1000
         postgres_connection_password: postgres_password
         postgres_container_network: "{{ lago_container_network }}"
+        # Lago's schema (db/structure.sql) does `CREATE EXTENSION pg_partman`,
+        # which the stock `postgres` image this role's Postgres role installs
+        # does not ship. Without it `rails db:migrate` aborts, and - because the
+        # API image's entrypoint has no error handling - the API then starts
+        # anyway and answers /health with 200 on a completely empty database.
+        #
+        # Upstream publishes `getlago/postgres-partman` for exactly this reason
+        # and uses it in its own docker-compose.yml, so the scenario runs against
+        # it. Deciding how the fleet as a whole should provide a Postgres with
+        # pg_partman for Lago is a separate, playbook-level question.
+        postgres_container_image_to_use: docker.io/getlago/postgres-partman:15.0-alpine
+        # The verification queries the database directly; the other roles'
+        # defaults are not in scope there, so its coordinates are spelled out.
+        lago_molecule_postgres_container: postgres
+        lago_molecule_postgres_superuser: root
         postgres_managed_databases: |
           {{
             [{
