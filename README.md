@@ -18,6 +18,16 @@ Check [`defaults/main.yml`](defaults/main.yml) for the full list of supported op
 
 💡 For an Ansible playbook which integrates this role and makes it easier to use, see the [Mother-of-All-Self-Hosting Ansible playbook](https://github.com/mother-of-all-self-hosting/mash-playbook).
 
+## Requirements
+
+### A Postgres server which has `pg_partman`
+
+Lago's database schema (`db/structure.sql` in [`getlago/lago-api`](https://github.com/getlago/lago-api)) runs `CREATE EXTENSION pg_partman`, and has done so since Lago v1.41.0. `pg_partman` is not part of a stock Postgres installation, so the Postgres server this role is pointed at must have the extension available. Upstream publishes [`getlago/postgres-partman`](https://hub.docker.com/r/getlago/postgres-partman) for this purpose and uses it in its own `docker-compose.yml`.
+
+⚠️ Without it, the failure is silent rather than loud. The API container's entrypoint runs `rails db:migrate` and then starts the web server whether or not the migration succeeded, and Lago's `/health` endpoint only issues an empty statement on its database connection — so it answers `200 Success` against a database with no tables in it at all. The result is a Lago which looks up and is entirely unusable.
+
+The Molecule scenario in this repository pins Postgres to upstream's image for exactly this reason; see [`molecule/default/molecule.yml`](molecule/default/molecule.yml).
+
 ## Development
 
 ### pre-commit
