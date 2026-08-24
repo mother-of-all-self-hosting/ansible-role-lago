@@ -21,6 +21,38 @@
           - python3-requests
         state: present
 
+    # The scenario runs Lago and Postgres as UID/GID 1000, and the Postgres role
+    # mounts the host's /etc/passwd into its container so that the UID resolves
+    # to a name. Postgres' initdb refuses to run when it does not
+    # ("could not look up effective user ID 1000: user does not exist").
+    #
+    # The Ubuntu test image happens to ship an `ubuntu` user at 1000 and the
+    # Debian one ships nothing at all there, which is the kind of difference
+    # that turns into a scenario that passes on one distribution only.
+    - name: Check whether UID 1000 already resolves for Lago Molecule tests
+      ansible.builtin.command:
+        cmd: getent passwd 1000
+      register: lago_molecule_uid_lookup
+      changed_when: false
+      failed_when: false
+
+    - name: Ensure UID 1000 resolves to a user for Lago Molecule tests
+      when: lago_molecule_uid_lookup.rc != 0
+      block:
+        - name: Ensure the group for Lago Molecule tests exists
+          ansible.builtin.group:
+            name: lago-molecule
+            gid: 1000
+            state: present
+
+        - name: Ensure the user for Lago Molecule tests exists
+          ansible.builtin.user:
+            name: lago-molecule
+            uid: 1000
+            group: lago-molecule
+            create_home: false
+            state: present
+
     - name: Ensure Docker is installed for Lago Molecule tests preparation
       ansible.builtin.include_role:
         name: ansible-role-docker
