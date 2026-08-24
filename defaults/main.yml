@@ -22,8 +22,14 @@ lago_pdf_base_path: "{{ lago_base_path }}/pdf"
 # renovate: datasource=docker depName=getlago/api versioning=semver
 lago_version: v1.51.0
 
+# The value must stay quoted. Gotenberg tags are two-component numbers, which
+# YAML would otherwise read as floats and silently strip the trailing zero from:
+# an unquoted `7.10` became the float `7.1`, the role went looking for the
+# non-existent `getlago/lago-gotenberg:7.1` image, and CI went red. Every
+# `x.y0` tag Renovate proposes from here on would hit the same trap.
+#
 # renovate: datasource=docker depName=getlago/lago-gotenberg
-lago_gotenberg_version: 8.15
+lago_gotenberg_version: "8.15"
 
 lago_uid: ""
 lago_gid: ""
