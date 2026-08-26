@@ -7,6 +7,6 @@
     "Both failure modes are caught by the Molecule run on the pull request, which is exactly the checkpoint that automerging would remove."
   ],
   "extends": [
-    "github>mother-of-all-self-hosting/renovate-config#v1.0.0"
+    "github>mother-of-all-self-hosting/renovate-config#v1.1.0"
   ]
 }
