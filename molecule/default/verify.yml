@@ -374,13 +374,13 @@
     - name: Show the Lago verification summary
       ansible.builtin.debug:
         msg:
-          - "systemd: {{ dict(lago_verify_units | zip(lago_services.results | map(attribute='status.ActiveState'))) }}"
-          - "unconfigured image: exited rc={{ lago_control.rc }}"
-          - "migrations: {{ lago_migrations.stdout | trim }} recorded, billing tables present={{ lago_billing_tables.stdout | trim }}"
-          - "API: {{ lago_api_health.status }} {{ lago_api_health.json.message }}, version {{ lago_api_health.json.version }}"
-          - "worker: {{ lago_worker_live.status }} {{ lago_worker_live.content | trim }}"
-          - "sidekiq web: {{ lago_sidekiq_web.status }}"
-          - "PDF: {{ lago_pdf_health.json.status }} (chromium and libreoffice up)"
-          - "frontend: {{ lago_front_page.status }}, API URL {{ lago_api_environment_variable_lago_api_url }}"
-          - "images: {{ lago_containers.values() | map(attribute='Config.Image') | list }}"
-          - "restarts: {{ dict(lago_verify_units | zip(lago_restarts_after.results | map(attribute='status.NRestarts'))) }}"
+          - "Lago systemd: {{ dict(lago_verify_units | zip(lago_services.results | map(attribute='status.ActiveState'))) }}"
+          - "Lago unconfigured image: exited rc={{ lago_control.rc }}"
+          - "Lago migrations: {{ lago_migrations.stdout | trim }} recorded, billing tables present={{ lago_billing_tables.stdout | trim }}"
+          - "Lago API: {{ lago_api_health.status }} {{ lago_api_health.json.message }}, version {{ lago_api_health.json.version }}"
+          - "Lago worker: {{ lago_worker_live.status }} {{ lago_worker_live.content | trim }}"
+          - "Lago sidekiq web: {{ lago_sidekiq_web.status }}"
+          - "Lago PDF: {{ lago_pdf_health.json.status }} (chromium and libreoffice up)"
+          - "Lago frontend: {{ lago_front_page.status }}, API URL {{ lago_api_environment_variable_lago_api_url }}"
+          - "Lago images: {{ lago_containers.values() | map(attribute='Config.Image') | list }}"
+          - "Lago restarts: {{ dict(lago_verify_units | zip(lago_restarts_after.results | map(attribute='status.NRestarts'))) }}"
