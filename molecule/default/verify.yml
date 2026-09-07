@@ -115,7 +115,7 @@
           {{ dict(lago_verify_units | zip(lago_services.results | map(attribute='status.ActiveState'))) }}
         success_msg: "All five Lago systemd services are active"
 
-    - name: Retrieve the Lago service logs for debugging
+    - name: Retrieve the Lago systemd service log for debugging
       when: lago_debug_service_enabled | bool
       ansible.builtin.command:
         cmd: "journalctl -xeu {{ item }}"
