@@ -52,7 +52,7 @@
       register: lago_containers_raw
       changed_when: false
 
-    - name: Make sense of the Lago containers
+    - name: Parse the Lago container definition
       ansible.builtin.set_fact:
         lago_containers: >-
           {{
