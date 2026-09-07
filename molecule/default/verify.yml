@@ -106,7 +106,13 @@
       retries: 36
       delay: 5
       loop: "{{ lago_verify_units }}"
+      # So that giving up is reported by the assertion below rather than as a
+      # wall of systemd unit properties.
+      failed_when: false
 
+    # `Restart=always` in the systemd unit means that even a container which crashes
+    # and gets restarted reads as active here, so this is a precondition rather than
+    # a result.
     - name: Assert the Lago systemd services are active
       ansible.builtin.assert:
         that: lago_services.results | map(attribute='status.ActiveState') | unique | list == ['active']
