@@ -22,16 +22,18 @@
     # so a leftover container can never be mistaken for another scenario's.
     lago_verify_control_container: "{{ inventory_hostname }}-negative-control"
 
+    lago_verify_psql: >-
+      docker exec {{ lago_molecule_postgres_container }}
+      psql -U {{ lago_molecule_postgres_superuser }} -d {{ lago_database_name }} -tAc
+
     lago_verify_units:
       - lago-api.service
       - lago-api-worker.service
       - lago-api-clock.service
       - lago-front.service
       - lago-pdf.service
-
-    lago_verify_psql: >-
-      docker exec {{ lago_molecule_postgres_container }}
-      psql -U {{ lago_molecule_postgres_superuser }} -d {{ lago_database_name }} -tAc
+      - postgres.service
+      - valkey.service
 
   tasks:
     # The role is not included in this playbook, so its defaults are not in
@@ -117,14 +119,14 @@
       ansible.builtin.assert:
         that: lago_services.results | map(attribute='status.ActiveState') | unique | list == ['active']
         fail_msg: >-
-          Not every Lago service is active:
+          Not every service is active:
           {{ dict(lago_verify_units | zip(lago_services.results | map(attribute='status.ActiveState'))) }}
-        success_msg: "All five Lago systemd services are active"
+        success_msg: "Every systemd service is active"
 
-    - name: Retrieve the Lago systemd service log for debugging
+    - name: Retrieve the Lago systemd services log for debugging
       when: lago_debug_service_enabled | bool
       ansible.builtin.command:
-        cmd: "journalctl -xeu {{ item }}"
+        cmd: "journalctl --no-pager --output=cat --unit={{ item }}"
       changed_when: false
       loop: "{{ lago_verify_units }}"
 
@@ -380,7 +382,7 @@
     - name: Show the Lago verification summary
       ansible.builtin.debug:
         msg:
-          - "Lago systemd: {{ dict(lago_verify_units | zip(lago_services.results | map(attribute='status.ActiveState'))) }}"
+          - "Lago systemd: {% for unit, state in lago_verify_units | zip(lago_services.results | map(attribute='status.ActiveState')) %}{{ unit }} ({{ state }}){% if not loop.last %}, {% endif %}{% endfor %}"
           - "Lago unconfigured image: exited rc={{ lago_control.rc }}"
           - "Lago migrations: {{ lago_migrations.stdout | trim }} recorded, billing tables present={{ lago_billing_tables.stdout | trim }}"
           - "Lago API: {{ lago_api_health.status }} {{ lago_api_health.json.message }}, version {{ lago_api_health.json.version }}"
