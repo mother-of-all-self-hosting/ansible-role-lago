@@ -136,23 +136,26 @@
         # The PDF renderer is not merely listening, it has its engines up
         # ------------------------------------------------------------------
 
-        - name: Wait for the Lago PDF service to report itself up (up to 3m)
+        - name: Wait for the Lago PDF service to report itself healthy (up to 180s)
           ansible.builtin.uri:
             url: "{{ lago_verify_pdf_url }}/health"
             status_code: [200, 503]
           register: lago_pdf_health
-          until: lago_pdf_health.status == 200
+          until: lago_pdf_health.status == 200 and lago_pdf_health.json.status == 'up'
           retries: 36
           delay: 5
+          # So that giving up is reported by the assertion below rather than as a
+          # wall of systemd unit properties.
+          failed_when: false
 
-        - name: Assert the Lago PDF service has both of its rendering engines up
+        - name: Assert the Lago PDF service reports itself healthy
           ansible.builtin.assert:
             that:
               - lago_pdf_health.json.status == 'up'
               - lago_pdf_health.json.details.chromium.status == 'up'
               - lago_pdf_health.json.details.libreoffice.status == 'up'
-            fail_msg: "The Lago PDF service is not fully up: {{ lago_pdf_health.json }}"
-            success_msg: "The Lago PDF service has Chromium and LibreOffice up, so it can render invoices"
+            fail_msg: "Lago PDF service did not report itself healthy: {{ lago_pdf_health.json | default('no response') }}"
+            success_msg: "Lago PDF service reports itself, Chromium, and LibreOffice healthy"
 
         # ------------------------------------------------------------------
         # The migrations ran, which /health alone does not tell you
@@ -200,29 +203,32 @@
         # The API answers, and names the version this role pins
         # ------------------------------------------------------------------
 
-        - name: Wait for the Lago API to answer (up to 5m)
+        - name: Wait for the Lago API to report itself healthy (up to 180s)
           ansible.builtin.uri:
             url: "{{ lago_verify_api_url }}/health"
             status_code: [200, 500, 502, 503]
           register: lago_api_health
-          until: lago_api_health.status == 200
-          retries: 60
+          until: lago_api_health.status == 200 and lago_api_health.json.message == 'Success'
+          retries: 36
           delay: 5
+          # So that giving up is reported by the assertion below rather than as a
+          # wall of systemd unit properties.
+          failed_when: false
+
+        - name: Assert the Lago API reports itself healthy
+          ansible.builtin.assert:
+            that: lago_api_health.json.message == 'Success'
+            fail_msg: "Lago API did not report itself healthy: {{ lago_api_health.json.message | default('no response') }}"
+            success_msg: "Lago API reports itself healthy"
 
         # /health reports the contents of the image's LAGO_VERSION file, which is the
         # release tag. Comparing it with the leaf variable Renovate bumps is what ties
         # the process that is actually running to the version the role claims to pin.
-        - name: Assert the running Lago API is healthy and is the version this role installs
+        - name: Assert the running Lago is the version this role installs
           ansible.builtin.assert:
-            that:
-              - lago_api_health.json.message == 'Success'
-              - lago_api_health.json.version == lago_defaults.lago_version
-            fail_msg: >-
-              The Lago API reported {{ lago_api_health.json }}, expected
-              version {{ lago_defaults.lago_version }} and message "Success"
-            success_msg: >-
-              The running Lago API reports itself as {{ lago_api_health.json.version }},
-              which is what `lago_version` pins
+            that: lago_api_health.json.version == lago_defaults.lago_version
+            fail_msg: "Lago API reports {{ lago_api_health.json.version | default('none') }}, expected {{ lago_defaults.lago_version }}"
+            success_msg: "Lago API reports {{ lago_api_health.json.version }}"
 
         # ------------------------------------------------------------------
         # The worker is running, and is not merely a unit that reads `active`
