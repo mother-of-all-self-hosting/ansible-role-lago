@@ -30,6 +30,7 @@ provisioner:
       all:
         # Helper variables
         lago_debug_service_enabled: false
+        lago_restarts_check_enabled: true
 
         # The container names the role derives from the identifiers below.
         # Role defaults are not in scope in a verify play, so they are spelled out.
