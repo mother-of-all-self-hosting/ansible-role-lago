@@ -234,6 +234,12 @@ lago_api_container_extra_arguments: "{{ lago_api_container_extra_arguments_auto 
 lago_api_container_extra_arguments_auto: []
 lago_api_container_extra_arguments_custom: []
 
+# A list of extra arguments to pass to the process inside the container
+# Example: ['--SOME_ARGUMENT']
+lago_api_process_extra_arguments: "{{ lago_api_process_extra_arguments_auto + lago_api_process_extra_arguments_custom }}"
+lago_api_process_extra_arguments_auto: []
+lago_api_process_extra_arguments_custom: []
+
 # List of systemd services that the Lago API systemd service depends on
 lago_api_systemd_required_services_list: "{{ lago_api_systemd_required_services_list_default + lago_api_systemd_required_services_list_auto + lago_api_systemd_required_services_list_custom }}"
 lago_api_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
@@ -506,6 +512,12 @@ lago_front_container_extra_arguments: "{{ lago_front_container_extra_arguments_a
 lago_front_container_extra_arguments_auto: []
 lago_front_container_extra_arguments_custom: []
 
+# A list of extra arguments to pass to the process inside the container
+# Example: ['--SOME_ARGUMENT']
+lago_front_process_extra_arguments: "{{ lago_front_process_extra_arguments_auto + lago_front_process_extra_arguments_custom }}"
+lago_front_process_extra_arguments_auto: []
+lago_front_process_extra_arguments_custom: []
+
 # List of systemd services that the Lago front systemd service depends on
 lago_front_systemd_required_services_list: "{{ lago_front_systemd_required_services_list_default + lago_front_systemd_required_services_list_auto + lago_front_systemd_required_services_list_custom }}"
 lago_front_systemd_required_services_list_default: |
@@ -673,6 +685,12 @@ lago_pdf_container_tmpfs_tmp_size: 512m
 lago_pdf_container_extra_arguments: "{{ lago_pdf_container_extra_arguments_auto + lago_pdf_container_extra_arguments_custom }}"
 lago_pdf_container_extra_arguments_auto: []
 lago_pdf_container_extra_arguments_custom: []
+
+# A list of extra arguments to pass to the process inside the container
+# Example: ['--SOME_ARGUMENT']
+lago_pdf_process_extra_arguments: "{{ lago_pdf_process_extra_arguments_auto + lago_pdf_process_extra_arguments_custom }}"
+lago_pdf_process_extra_arguments_auto: []
+lago_pdf_process_extra_arguments_custom: []
 
 # List of systemd services that the Lago PDF systemd service depends on
 lago_pdf_systemd_required_services_list: "{{ lago_pdf_systemd_required_services_list_default + lago_pdf_systemd_required_services_list_auto + lago_pdf_systemd_required_services_list_custom }}"
