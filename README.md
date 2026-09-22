@@ -26,7 +26,7 @@ Lago's database schema (`db/structure.sql` in [`getlago/lago-api`](https://githu
 
 ⚠️ Without it, the failure is silent rather than loud. The API container's entrypoint runs `rails db:migrate` and then starts the web server whether or not the migration succeeded, and Lago's `/health` endpoint only issues an empty statement on its database connection — so it answers `200 Success` against a database with no tables in it at all. The result is a Lago which looks up and is entirely unusable.
 
-The Molecule scenario in this repository pins Postgres to upstream's image for exactly this reason; see [`molecule/default/molecule.yml`](molecule/default/molecule.yml).
+The Molecule scenario in this repository pins Postgres to upstream's image for exactly this reason; refer to [`molecule/default/molecule.yml`](molecule/default/molecule.yml).
 
 ## Development
 
