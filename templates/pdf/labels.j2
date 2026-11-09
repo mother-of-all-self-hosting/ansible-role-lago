@@ -14,7 +14,7 @@ traefik.docker.network={{ lago_pdf_container_labels_traefik_docker_network }}
 {% set middlewares = [] %}
 
 {% if lago_pdf_container_labels_traefik_path_prefix != '/' %}
-traefik.http.middlewares.{{ lago_identifier }}-pdf-slashless-redirect.redirectregex.regex=^({{ lago_pdf_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ lago_identifier }}-pdf-slashless-redirect.redirectregex.regex=^(https?://[^/]+{{ lago_pdf_container_labels_traefik_path_prefix | regex_escape }})$
 traefik.http.middlewares.{{ lago_identifier }}-pdf-slashless-redirect.redirectregex.replacement=${1}/
 {% set middlewares = middlewares + [lago_identifier + '-pdf-slashless-redirect'] %}
 {% endif %}
