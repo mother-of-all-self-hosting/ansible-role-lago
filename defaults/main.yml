@@ -294,7 +294,7 @@ lago_api_environment_variable_lago_api_url: "{{ lago_scheme }}://{{ lago_hostnam
 lago_api_environment_variable_lago_front_url: "{{ lago_scheme }}://{{ lago_hostname }}{{ '' if lago_path_prefix == '/' else lago_path_prefix }}"
 
 # Controls the DATABASE_URL environment variable
-lago_api_environment_variable_database_url: "postgresql://{{ lago_database_username }}:{{ lago_database_password }}@{{ lago_database_hostname }}:{{ lago_database_port }}/{{ lago_database_name }}"
+lago_api_environment_variable_database_url: "postgresql://{{ lago_database_username | urlencode | replace('/', '%2F') }}:{{ lago_database_password | urlencode | replace('/', '%2F') }}@{{ lago_database_hostname }}:{{ lago_database_port }}/{{ lago_database_name }}"
 
 # Controls the REDIS_URL environment variable
 lago_api_environment_variable_redis_url: "redis://{{ lago_redis_hostname }}:{{ lago_redis_port }}"
